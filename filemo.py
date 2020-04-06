@@ -61,9 +61,16 @@ class StartPage(tk.Frame):
 
     def removeFile(self):
         selected = self.selected_list.curselection()
-        value = self.selected_list.get(selected[0])
-        self.selected_list.delete(selected[0])
-        self.controller.files.remove(value)
+        try:
+            value = self.selected_list.get(selected[0])
+        except:
+            print("No file is selected")
+            return
+        try:
+            self.selected_list.delete(selected[0])
+            self.controller.files.remove(value)
+        except:
+            print("Error removing file from files list")
 
 
 class CodePage(tk.Frame):
