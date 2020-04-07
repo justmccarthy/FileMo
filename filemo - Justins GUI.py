@@ -1,3 +1,4 @@
+import os, getpass, Interpreter
 import tkinter as tk
 from tkinter import filedialog
 from tkfilebrowser import askopendirnames
@@ -71,7 +72,8 @@ class StartPage(tk.Frame):
 
     # Select files to be sorted
     def addFiles(self):
-        temp = askopendirnames()
+        user = getpass.getuser()
+        temp = askopendirnames(initialdir='C:/Users/%s' % user)
         for filename in temp:
             if filename not in self.controller.files:
                 self.selected_list.insert('end', filename)
@@ -171,7 +173,8 @@ class CodePage(tk.Frame):
     # Save script as a local file
     def saveScript(self):
         try:
-            filename = filedialog.asksaveasfilename(initialdir = "/", title = "Select save file", filetypes = (("text files","*.txt"),("all files","*.*")))
+            path = os.getcwd() + "\scripts"
+            filename = filedialog.asksaveasfilename(initialdir = path, title = "Select save file", filetypes = (("text files","*.txt"),("all files","*.*")))
             with open(filename, 'w') as f:
                 scriptCode = str(self.code.get(1.0, 'end'))
                 f.write(scriptCode)
@@ -183,8 +186,9 @@ class CodePage(tk.Frame):
     # Load local script file
     def loadScript(self):
         try:
+            path = os.getcwd() + "\scripts"
             self.code.delete(1.0, 'end')
-            filename = filedialog.askopenfilename(initialdir = "/", title = "Select script to load", filetypes = (("text files","*.txt"),("all files","*.*")))
+            filename = filedialog.askopenfilename(initialdir = path, title = "Select script to load", filetypes = (("text files","*.txt"),("all files","*.*")))
             with open(filename, 'r') as f:
                 scriptCode = f.read()
                 self.code.insert('end', scriptCode)
@@ -198,10 +202,15 @@ class CodePage(tk.Frame):
         self.controller.script = str(self.code.get(1.0, 'end'))
         if self.controller.script.isspace():
             print("No code has been writen") # Added popup error message for this
-        elif self.controller.script:
+        elif self.controller.destFile == '':
             print("A destination has not been set") # Added popup error message for this
+        elif len(self.controller.files) == 0:
+            print("Select some files to be sorted")  # Added popup error message for this
         else:
             print("run script")
+            Process = Interpreter.LexicalAnalyzer(self.controller.destFile, self.controller.files)
+            Script = self.code.get(0.0, tk.END)  # get all text in box
+            Process.parseTokens(Script)
         return
 
 
