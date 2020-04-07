@@ -8,6 +8,7 @@ class SampleApp(tk.Tk):
         tk.Tk.__init__(self)
 
         self.files = []
+        self.destFile = ""
 
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -33,6 +34,7 @@ class SampleApp(tk.Tk):
         frame = self.frames[page_name]
         frame.grid()
         frame.tkraise()
+        frame.winfo_toplevel().geometry("")
         frame.update_idletasks()
         x = (frame.winfo_screenwidth() - frame.winfo_reqwidth()) / 2
         y = (frame.winfo_screenheight() - frame.winfo_reqheight()) / 3
@@ -129,11 +131,11 @@ class CodePage(tk.Frame):
         code = tk.Text(right_frame, width=70, height=30, bg='#ffffff')
         code.grid(row=1, column=0, columnspan=4, rowspan=3, sticky='nsew', pady=(0,10))
 
-        dir_button = tk.Button(right_frame, text="Destination Directory", command=None)
+        dir_button = tk.Button(right_frame, text="Destination Directory", command=self.getDestDir)
         dir_button.grid(row=4, column=0, sticky='ew')
 
-        dest_entry = tk.Entry(right_frame, bg='#ffffff', font=("Arial", 14))
-        dest_entry.grid(row=4, column=1, columnspan=2, sticky='we')
+        self.dest_entry = tk.Entry(right_frame, textvariable=self.controller.destFile, state='readonly', bg='#ffffff')
+        self.dest_entry.grid(row=4, column=1, columnspan=2, sticky='we')
 
         run_button = tk.Button(right_frame, text="Run Script",
                            command=lambda: controller.show_frame("StartPage"))
@@ -143,6 +145,14 @@ class CodePage(tk.Frame):
         right_frame.grid_columnconfigure(0, weight=1)
         right_frame.grid_columnconfigure(1, weight=2)
         right_frame.grid_columnconfigure(2, weight=2)
+
+    def getDestDir(self):
+        self.controller.destFile = filedialog.askdirectory()
+        self.dest_entry.configure(state="normal")
+        self.dest_entry.delete(0, 'end')
+        self.dest_entry.insert('0', self.controller.destFile)
+        self.dest_entry.configure(state="readonly")
+
 
 if __name__ == "__main__":
     app = SampleApp()
