@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
-from tkfilebrowser import askopendirnames
+from tkfilebrowser import askopendirnames, asksaveasfilename
 
 class SampleApp(tk.Tk):
 
@@ -47,7 +47,7 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        label = tk.Label(self, text="This is the start page")
+        label = tk.Label(self, text="Select files to be sorted")
         label.pack(side="top", fill="x", pady=10)
 
         self.selected_list = tk.Listbox(self, selectmode="multiple", height=20, width=50, bg='#ffffff')
@@ -110,10 +110,10 @@ class CodePage(tk.Frame):
         cheat_sheet = tk.Text(left_frame, width=35, height=15, bg='#ffffff')
         cheat_sheet.grid(row=1, sticky='nsew', pady=(0,10))
 
-        load_button = tk.Button(left_frame, text="Load Script", command=None)
+        load_button = tk.Button(left_frame, text="Load Script", command=self.loadScript)
         load_button.grid(row=2, sticky='s', pady=10)
 
-        save_button = tk.Button(left_frame, text="Save Script", command=None)
+        save_button = tk.Button(left_frame, text="Save Script", command=self.saveScript)
         save_button.grid(row=3, sticky='s', pady=10)
 
         back_button = tk.Button(left_frame, text="Back",
@@ -128,8 +128,8 @@ class CodePage(tk.Frame):
         code_label = tk.Label(right_frame, text="Your code:")
         code_label.grid(sticky='w')
 
-        code = tk.Text(right_frame, width=70, height=30, bg='#ffffff')
-        code.grid(row=1, column=0, columnspan=4, rowspan=3, sticky='nsew', pady=(0,10))
+        self.code = tk.Text(right_frame, width=70, height=30, bg='#ffffff')
+        self.code.grid(row=1, column=0, columnspan=4, rowspan=3, sticky='nsew', pady=(0,10))
 
         dir_button = tk.Button(right_frame, text="Destination Directory", command=self.getDestDir)
         dir_button.grid(row=4, column=0, sticky='ew')
@@ -153,6 +153,26 @@ class CodePage(tk.Frame):
         self.dest_entry.insert('0', self.controller.destFile)
         self.dest_entry.configure(state="readonly")
 
+    def saveScript(self):
+        filename = filedialog.asksaveasfilename(initialdir = "/", title = "Select save file", filetypes = (("text files","*.txt"),("all files","*.*")))
+        if filename is None:
+            print("No files was selected")
+            return
+        with open(filename, 'w') as f:
+            scriptCode = str(self.code.get(1.0, 'end'))
+            f.write(scriptCode)
+            f.close()
+
+    def loadScript(self):
+        self.code.delete(1.0, 'end')
+        filename = filedialog.askopenfilename(initialdir = "/", title = "Select save file", filetypes = (("text files","*.txt"),("all files","*.*")))
+        if filename is None:
+            print("No files was selected")
+            return
+        with open(filename, 'r') as f:
+            scriptCode = f.read()
+            self.code.insert('end', scriptCode)
+            f.close()
 
 if __name__ == "__main__":
     app = SampleApp()
