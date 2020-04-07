@@ -33,6 +33,10 @@ class SampleApp(tk.Tk):
         frame = self.frames[page_name]
         frame.grid()
         frame.tkraise()
+        frame.update_idletasks()
+        x = (frame.winfo_screenwidth() - frame.winfo_reqwidth()) / 2
+        y = (frame.winfo_screenheight() - frame.winfo_reqheight()) / 3
+        self.geometry("+{}+{}".format(int(x), int(y)))
 
 
 class StartPage(tk.Frame):
