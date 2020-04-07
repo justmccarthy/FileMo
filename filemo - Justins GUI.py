@@ -1,3 +1,4 @@
+import os, getpass, re, Interpreter
 import tkinter as tk
 from tkinter import filedialog
 from tkfilebrowser import askopendirnames
@@ -51,9 +52,13 @@ class StartPage(tk.Frame):
         self.selected_list = tk.Listbox(self, selectmode="multiple", height=20, width=50, bg='#ffffff')
         self.selected_list.pack(padx=15, fill='both')
 
-        file_button = tk.Button(self, text="Select files",
-                                command=self.openFiles)
+        file_button = tk.Button(self, text="Select folders",
+                                command=self.openFolders)
         file_button.pack()
+
+        #file_button = tk.Button(self, text="Select files",
+        #                        command=self.openFiles)
+        #ile_button.pack()
 
         file_button = tk.Button(self, text="Remove selected",
                                 command=self.removeFile)
@@ -63,9 +68,12 @@ class StartPage(tk.Frame):
                                 command=lambda: controller.show_frame("CodePage"))
         next_button.pack()
 
-    def openFiles(self):
-        temp = askopendirnames()
-        self.controller.files = list(temp)
+    def openFolders(self):
+        #temp = askopendirnames()
+        #self.controller.files = list(temp)
+        user = getpass.getuser()  # gets username for default file path
+        temp = filedialog.askdirectory(initialdir='C:/Users/%s' % user)
+        self.controller.files.append(temp)
         for x in self.controller.files:
             self.selected_list.insert('end', x)
 
@@ -108,10 +116,10 @@ class CodePage(tk.Frame):
         cheat_sheet = tk.Text(left_frame, width=35, height=15, bg='#ffffff')
         cheat_sheet.grid(row=1, sticky='nsew', pady=(0,10))
 
-        load_button = tk.Button(left_frame, text="Load Script", command=None)
+        load_button = tk.Button(left_frame, text="Load Script", command=self.LoadScript)
         load_button.grid(row=2, sticky='s', pady=10)
 
-        save_button = tk.Button(left_frame, text="Save Script", command=None)
+        save_button = tk.Button(left_frame, text="Save Script", command=self.SaveScript)
         save_button.grid(row=3, sticky='s', pady=10)
 
         back_button = tk.Button(left_frame, text="Back",
@@ -126,23 +134,75 @@ class CodePage(tk.Frame):
         code_label = tk.Label(right_frame, text="Your code:")
         code_label.grid(sticky='w')
 
-        code = tk.Text(right_frame, width=70, height=30, bg='#ffffff')
-        code.grid(row=1, column=0, columnspan=4, rowspan=3, sticky='nsew', pady=(0,10))
+        self.code = tk.Text(right_frame, width=70, height=30, bg='#ffffff')
+        self.code.grid(row=1, column=0, columnspan=4, rowspan=3, sticky='nsew', pady=(0,10))
 
-        dir_button = tk.Button(right_frame, text="Destination Directory", command=None)
+        dir_button = tk.Button(right_frame, text="Destination Directory", command=self.SelectToDirectory)
         dir_button.grid(row=4, column=0, sticky='ew')
 
-        dest_entry = tk.Entry(right_frame, bg='#ffffff', font=("Arial", 14))
-        dest_entry.grid(row=4, column=1, columnspan=2, sticky='we')
+        self.dest_entry = tk.Entry(right_frame, bg='#ffffff', font=("Arial", 14))
+        self.dest_entry.grid(row=4, column=1, columnspan=2, sticky='we')
 
-        run_button = tk.Button(right_frame, text="Run Script",
-                           command=lambda: controller.show_frame("StartPage"))
+        run_button = tk.Button(right_frame, text="Run Script", command=self.doScript)
         run_button.grid(row=4, column=3, sticky='se')
 
         right_frame.grid_rowconfigure(1, weight=3)
         right_frame.grid_columnconfigure(0, weight=1)
         right_frame.grid_columnconfigure(1, weight=2)
         right_frame.grid_columnconfigure(2, weight=2)
+
+    def SaveScript(self):  # opens Save file dialog box and saves(overwrites) contents of the script window into file
+        self.path = os.getcwd() + "\scripts"
+        print("need to write save function")
+        filename = filedialog.asksaveasfilename(initialdir=self.path, title="Select file", filetypes=(("text file", "*.txt"), ("all files", "*.*")))
+        try:
+            with open(filename, 'w') as f:
+                text = self.code.get(0.0, tk.END)
+                f.write(text)
+                f.close()
+        except:
+            print("File could not be saved")
+
+    def LoadScript(self):  # opens Open file dialog box and loads(overwrites) contents of file into the script window
+        self.path = os.getcwd() + "\scripts"
+        print("need to write Load function")
+        self.code.delete(0.0, tk.END)
+        filename = filedialog.askopenfilename(initialdir=self.path, title="Save file", filetypes=((".Txt", "*.txt"), ("all files", "*.*")))  # show an "Open" dialog box and return the path to the selected file
+        try:
+            with open(filename, 'r') as f:
+                text = f.read()
+                self.code.insert(0.0, text)
+                f.close()
+        except:
+            print("File could not be loaded")
+
+    def SelectToDirectory(self):# opens a directory selection dialog and sets sortDest
+        user = getpass.getuser()  # gets username for default file path
+        filename = filedialog.askdirectory(initialdir='C:/Users/%s' % user)  # show an "Open" dialog box and return the path to the selected file
+        # print(filename) # debug
+        if (filename != ""): #
+            self.dest_entry.delete(0, tk.END) # delete contents of text window
+            self.dest_entry.insert(0, filename) # print to sortDest text window
+        else:
+            print("dir not selected") # debug
+
+    def doScript(self):  #
+        Script = self.code.get(0.0, tk.END)  # get all text in box
+        Dest = self.dest_entry.get()
+        GoodToGo = True
+        if not (re.match(r'[A-z]\:(\\[^\'"/?*|]+)*',Dest)):
+            GoodToGo[0] = False
+            print("select a destination")
+        if (len(self.controller.files) == 0):
+            GoodToGo[1] = False
+            print("select some files")
+        if (Script == ""):
+            GoodToGo[1] = False
+            print("write/load a script")
+        if GoodToGo == True:
+            Process = Interpreter.LexicalAnalyzer(Dest, self.controller.files)
+            Process.parseTokens(Script)
+        return
 
 if __name__ == "__main__":
     app = SampleApp()
