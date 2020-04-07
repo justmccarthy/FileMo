@@ -10,46 +10,53 @@ class MainGui():
     DestSet = False
     # Note: everything with a self. is also a class var and requires self. to access
 
-    def __init__(self, master):
+    def __init__(self):
         # initialize
         self.user = getpass.getuser() # gets username for use in default file path
         self.path = os.getcwd() # Gets current directory path for save / load
         self.path = self.path + "\scripts" # save / load to script dir
 
+        self.master = Tk()
+
+        self.createWindow()
+        self.master.mainloop()
+
+    def createWindow(self):
         # window setup
-        master.grid_rowconfigure(0, weight=1)
-        master.grid_rowconfigure(99, weight=1)
-        master.grid_columnconfigure(0, weight=1)
-        master.grid_columnconfigure(99, weight=1)
-        master.title("FileMo")  # set window title
+        self.master.grid_rowconfigure(0, weight=1)
+        self.master.grid_rowconfigure(99, weight=1)
+        self.master.grid_columnconfigure(0, weight=1)
+        self.master.grid_columnconfigure(99, weight=1)
+        self.master.title("FileMo")  # set window title
 
         # Spacers
-        Label(master, text="").grid(row=0, column=0, padx=20) # creates some space above and left
-        Label(master, text="").grid(row=99, column=99, padx=20) # creates some space below and right
-        Label(master, text="").grid(row=4, column=0, padx=20) # creates some between script window and buttons
-        Label(master, text="").grid(row=0, column=2, padx=20) # creates some between Cheat sheet and script window
+        Label(self.master, text="").grid(row=0, column=0, padx=20) # creates some space above and left
+        Label(self.master, text="").grid(row=99, column=99, padx=20) # creates some space below and right
+        Label(self.master, text="").grid(row=4, column=0, padx=20) # creates some between script window and buttons
+        Label(self.master, text="").grid(row=0, column=2, padx=20) # creates some between Cheat sheet and script window
 
         # Script input window
-        Label(master, text="Source Code Input:").grid(row=2, column=3, sticky=W, )  # create label for window
-        self.ScriptEntry = Text(master, width=120, height=15)
+
+        Label(self.master, text="Source Code Input:").grid(row=2, column=3, sticky=W, )  # create label for window
+        self.ScriptEntry = Text(self.master, width=120, height=15)
         self.ScriptEntry.grid(row=3, column=3, columnspan=2, sticky=E)  # create input box, set size
 
         # Selected Directory Window
-        self.DestDirEntry = Text(master, width=80, height=1)  # create input box, set size
+        self.DestDirEntry = Text(self.master, width=80, height=1)  # create input box, set size
         self.DestDirEntry.grid(row=1, column=4, columnspan=2, sticky=E)
         self.DestDirEntry.insert(0.0, "This Box is read only, use the \"Sort To:\" button to set the sort destination")
         self.DestDirEntry.config(state=DISABLED) # make read only
 
         # Buttons
-        Button(master, width=20, text="Run Script", command=self.doScript).grid(row=5, column=4, sticky=E)  # run button
-        Button(master, width=13, text="Sort To:", command=self.SelectToDirectory).grid(row=1, column=3, sticky=E) # select dir
-        Button(master, width=50, text="File Selector", command=self.SelectGui).grid(row=1, column=1, sticky=N) # file selector
-        Button(master, width=20, text="Save Script", command=self.SaveScript).grid(row=5, column=3, sticky=W)  # save button
-        Button(master, width=20, text="Load Script", command=self.LoadScript).grid(row=5, column=3, sticky=E)  # load button
+        Button(self.master, width=20, text="Run Script", command=self.doScript).grid(row=5, column=4, sticky=E)  # run button
+        Button(self.master, width=13, text="Sort To:", command=self.SelectToDirectory).grid(row=1, column=3, sticky=E) # select dir
+        Button(self.master, width=50, text="File Selector", command=self.SelectGui).grid(row=1, column=1, sticky=N) # file selector
+        Button(self.master, width=20, text="Save Script", command=self.SaveScript).grid(row=5, column=3, sticky=W)  # save button
+        Button(self.master, width=20, text="Load Script", command=self.LoadScript).grid(row=5, column=3, sticky=E)  # load button
 
         # cheatsheet window
-        Label(master, text="Cheat Sheet:").grid(row=2, column=1, sticky=W, )  # create label for window
-        self.CheatWindow = Text(master, width=50, height=18).grid(row=3, column=1, rowspan=3, sticky=E)  # create input box, set size
+        Label(self.master, text="Cheat Sheet:").grid(row=2, column=1, sticky=W, )  # create label for window
+        self.CheatWindow = Text(self.master, width=50, height=18).grid(row=3, column=1, rowspan=3, sticky=E)  # create input box, set size
         #todo: fill sheet with a cheats
         return
 
@@ -131,6 +138,5 @@ class MainGui():
         self.list.delete(self.list.curselection()) # remove item from listbox
 
 # runs GUI
-root = Tk()
-my_gui = MainGui(root)
-root.mainloop()
+my_gui = MainGui()
+
