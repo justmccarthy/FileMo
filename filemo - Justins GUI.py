@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
-from tkfilebrowser import askopendirnames, asksaveasfilename
+from tkfilebrowser import askopendirnames
 
 class SampleApp(tk.Tk):
 
@@ -9,6 +9,8 @@ class SampleApp(tk.Tk):
 
         self.files = []
         self.destFile = ""
+        self.script = ""
+        self.destFlag = False
 
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -27,6 +29,7 @@ class SampleApp(tk.Tk):
 
         self.show_frame("StartPage")
 
+    # Raise specified frame and reset geometry
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
         for frame in self.frames.values():
@@ -40,7 +43,7 @@ class SampleApp(tk.Tk):
         y = (frame.winfo_screenheight() - frame.winfo_reqheight()) / 3
         self.geometry("+{}+{}".format(int(x), int(y)))
 
-
+# Frame for selecting files to be sorted
 class StartPage(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -65,12 +68,14 @@ class StartPage(tk.Frame):
                                 command=lambda: controller.show_frame("CodePage"))
         next_button.pack()
 
+    # Select files to be sorted
     def openFiles(self):
         temp = askopendirnames()
         self.controller.files = list(temp)
         for x in self.controller.files:
             self.selected_list.insert('end', x)
 
+    # Remove selected files
     def removeFile(self):
         selected = self.selected_list.curselection()
         try:
@@ -85,6 +90,7 @@ class StartPage(tk.Frame):
             print("Error removing file from files list")
 
 
+# Frame for managing scripts and executing code
 class CodePage(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -137,8 +143,7 @@ class CodePage(tk.Frame):
         self.dest_entry = tk.Entry(right_frame, textvariable=self.controller.destFile, state='readonly', bg='#ffffff')
         self.dest_entry.grid(row=4, column=1, columnspan=2, sticky='we')
 
-        run_button = tk.Button(right_frame, text="Run Script",
-                           command=lambda: controller.show_frame("StartPage"))
+        run_button = tk.Button(right_frame, text="Run Script", command=self.runScript)
         run_button.grid(row=4, column=3, sticky='se')
 
         right_frame.grid_rowconfigure(1, weight=3)
@@ -146,13 +151,21 @@ class CodePage(tk.Frame):
         right_frame.grid_columnconfigure(1, weight=2)
         right_frame.grid_columnconfigure(2, weight=2)
 
+    # Set destination directoy
     def getDestDir(self):
         self.controller.destFile = filedialog.askdirectory()
         self.dest_entry.configure(state="normal")
         self.dest_entry.delete(0, 'end')
         self.dest_entry.insert('0', self.controller.destFile)
         self.dest_entry.configure(state="readonly")
+        
+        # Check if destination selection was canceled
+        if self.controller.destFile:
+            return
+        else:
+            self.controller.destFlag = True
 
+    # Save script as a local file
     def saveScript(self):
         try:
             filename = filedialog.asksaveasfilename(initialdir = "/", title = "Select save file", filetypes = (("text files","*.txt"),("all files","*.*")))
@@ -164,10 +177,11 @@ class CodePage(tk.Frame):
             print("File selection was canceled")
             return
 
+    # Load local script file
     def loadScript(self):
         try:
             self.code.delete(1.0, 'end')
-            filename = filedialog.askopenfilename(initialdir = "/", title = "Select save file", filetypes = (("text files","*.txt"),("all files","*.*")))
+            filename = filedialog.askopenfilename(initialdir = "/", title = "Select script to load", filetypes = (("text files","*.txt"),("all files","*.*")))
             with open(filename, 'r') as f:
                 scriptCode = f.read()
                 self.code.insert('end', scriptCode)
@@ -175,6 +189,19 @@ class CodePage(tk.Frame):
         except FileNotFoundError:
             print("File selection was canceled")
             return
+
+    # Execute script
+    def runScript(self):
+        self.controller.script = str(self.code.get(1.0, 'end'))
+        if self.controller.script.isspace():
+            print("No code has been writen") # Added popup error message for this
+        elif self.controller.script:
+            print("A destination has not been set") # Added popup error message for this
+        else:
+            print("run script")
+        return
+
+
 
 if __name__ == "__main__":
     app = SampleApp()
