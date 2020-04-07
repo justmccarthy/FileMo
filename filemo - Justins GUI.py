@@ -53,11 +53,12 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text="Select files to be sorted")
         label.pack(side="top", fill="x", pady=10)
 
-        self.selected_list = tk.Listbox(self, selectmode="multiple", height=20, width=50, bg='#ffffff')
+        # Add multiselected delete: add back (selectmode="multiple",)
+        self.selected_list = tk.Listbox(self, height=20, width=50, bg='#ffffff')
         self.selected_list.pack(padx=15, fill='both')
 
         file_button = tk.Button(self, text="Select files",
-                                command=self.openFiles)
+                                command=self.addFiles)
         file_button.pack()
 
         file_button = tk.Button(self, text="Remove selected",
@@ -69,11 +70,13 @@ class StartPage(tk.Frame):
         next_button.pack()
 
     # Select files to be sorted
-    def openFiles(self):
+    def addFiles(self):
         temp = askopendirnames()
-        self.controller.files = list(temp)
-        for x in self.controller.files:
-            self.selected_list.insert('end', x)
+        for filename in temp:
+            if filename not in self.controller.files:
+                self.selected_list.insert('end', filename)
+                self.controller.files.append(filename)
+
 
     # Remove selected files
     def removeFile(self):
