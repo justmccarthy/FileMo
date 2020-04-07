@@ -1,0 +1,10 @@
+modifydate.day = time.day:
+	/recentfiles/
+not type = avi:
+	/other non-avi/
+type = avi:
+	/avi/	
+time = date:
+	/dsadas/ asd/
+size = 500gb:
+	/sadas/
