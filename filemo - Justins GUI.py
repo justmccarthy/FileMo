@@ -154,25 +154,27 @@ class CodePage(tk.Frame):
         self.dest_entry.configure(state="readonly")
 
     def saveScript(self):
-        filename = filedialog.asksaveasfilename(initialdir = "/", title = "Select save file", filetypes = (("text files","*.txt"),("all files","*.*")))
-        if filename is None:
-            print("No files was selected")
+        try:
+            filename = filedialog.asksaveasfilename(initialdir = "/", title = "Select save file", filetypes = (("text files","*.txt"),("all files","*.*")))
+            with open(filename, 'w') as f:
+                scriptCode = str(self.code.get(1.0, 'end'))
+                f.write(scriptCode)
+                f.close()
+        except FileNotFoundError:
+            print("File selection was canceled")
             return
-        with open(filename, 'w') as f:
-            scriptCode = str(self.code.get(1.0, 'end'))
-            f.write(scriptCode)
-            f.close()
 
     def loadScript(self):
-        self.code.delete(1.0, 'end')
-        filename = filedialog.askopenfilename(initialdir = "/", title = "Select save file", filetypes = (("text files","*.txt"),("all files","*.*")))
-        if filename is None:
-            print("No files was selected")
+        try:
+            self.code.delete(1.0, 'end')
+            filename = filedialog.askopenfilename(initialdir = "/", title = "Select save file", filetypes = (("text files","*.txt"),("all files","*.*")))
+            with open(filename, 'r') as f:
+                scriptCode = f.read()
+                self.code.insert('end', scriptCode)
+                f.close()
+        except FileNotFoundError:
+            print("File selection was canceled")
             return
-        with open(filename, 'r') as f:
-            scriptCode = f.read()
-            self.code.insert('end', scriptCode)
-            f.close()
 
 if __name__ == "__main__":
     app = SampleApp()
