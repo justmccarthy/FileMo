@@ -75,11 +75,11 @@ class LexicalAnalyzer:
 		self._BuildOps(TokenTypes)
 
 	def _BuildOps(self, TokenType):
-		opbuilder = []
 		opList = []
 		state = 0
 		# print(TokenType) #debug
 		for x in TokenType:
+			opbuilder = []
 			# print (x, state) # debug
 			# path statement
 			if (x[0] == "path") and (state == 0):
@@ -138,24 +138,9 @@ class LexicalAnalyzer:
 			# end line
 			elif (x[0] == "endline") and ((state == 1) or (state == 14)):
 				state = 0
-				op = self._OpBuild(opbuilder)
 				opList.append(op)
 				opbuilder.clear()
 			else:
 				print("error: bad syntax at:", x[1])
 				print("state = ", state)
 				return
-				#opbuilder.clear()
-		#opList.append(TokenType)
-		#opList.pop(0)
-
-	def _OpBuild(self, opbuilder):
-		print(opbuilder)
-		if (opbuilder[0][0] == 'path'):
-			print(opbuilder[0])
-		# todo: write path op building
-		elif(opbuilder[-1] == 'endif'):
-			op = ''
-			for x in opbuilder:
-				print(x)
-		# todo: write if op building
