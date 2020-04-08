@@ -39,7 +39,6 @@ class LexicalAnalyzer:
         strin = strin.lower()  # were not doing case sensitivity
         Tokens = re.split(r'(?:(\".+?\")|(\'.+?\')|(\B\\.+\\(\B|\b))|(\B\/.+\/(\B|\b))|(\<\=)|(\>\=)|(\b\w+\b)|([\.\+\-\*\/\<\>\=\:\!\n\t]))', strin) # defines what tokens can look like and split accordingly
         Tokens = list(filter(None, Tokens))  # re.split used in on big regex like this causes a empty variables to to be added, this filters them out
-        print(Tokens)  # debug
         self._IdentifyTokens(Tokens)  # call identify tokens process, pass the token list
 
     def _IdentifyTokens(self, Tokens):  # need to work on names for token typings
@@ -102,20 +101,34 @@ class LexicalAnalyzer:
 
             # if type1: meta =
             elif (x[0] == "inv") and (state == 3):
-                opbuilder[0] = 5
+                opbuilder[0] = 6
                 state = 4
 
             elif (x[0] == "expression") and ((state == 3) or (state == 4)):
                 if x[1] == '=':
-                    opbuilder[0] += 1
+                    if opbuilder[0] != 6:
+                        opbuilder[0] = 1
                 elif x[1] == '>=':
-                    opbuilder[0] += 2
+                    if opbuilder[0] == 6:
+                        opbuilder[0] = 3
+                    else:
+                        opbuilder[0] = 2
+                elif x[1] == '<':
+                    if opbuilder[0] == 6:
+                        opbuilder[0] = 2
+                    else:
+                        opbuilder[0] = 3
                 elif x[1] == '<=':
-                    opbuilder[0] += 3
+                    if opbuilder[0] == 6:
+                        opbuilder[0] = 5
+                    else:
+                        opbuilder[0] = 4
                 elif x[1] == '>':
-                    opbuilder[0] += 4
-                elif x[1] == '>':
-                    opbuilder[0] += 5
+                    if opbuilder[0] == 6:
+                        opbuilder[0] = 4
+                    else:
+                        opbuilder[0] = 5
+
                 state = 5
 
             elif ((x[0] == "string") or (x[0] == "shortstring") or (x[0] == "size")) and (state == 5):
@@ -168,6 +181,4 @@ class LexicalAnalyzer:
                 print("error: bad syntax at:", x[1])
                 print("state = ", state)
                 return
-            print(opbuilder)
-
         Sorter.sorter(opList, self.Dest, self.SortFiles)
