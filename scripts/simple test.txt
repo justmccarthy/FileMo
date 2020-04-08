@@ -1,0 +1,7 @@
+type = png:
+	/png/
+type = ini
+	/ini/
+
+
+

@@ -1,7 +1,7 @@
 import os, getpass, Interpreter
 import tkinter as tk
 from tkinter import filedialog
-from tkfilebrowser import askopendirnames
+# from tkfilebrowser import askopendirnames, askopenfilenames # not in python installations by default
 
 class SampleApp(tk.Tk):
 
@@ -62,15 +62,63 @@ class StartPage(tk.Frame):
                                 command=self.addFiles)
         file_button.pack()
 
+        file_button = tk.Button(self, text="Select folders",
+                                command=self.addFolders)
+        file_button.pack()
+
         file_button = tk.Button(self, text="Remove selected",
                                 command=self.removeFile)
+        file_button.pack()
+
+        file_button = tk.Button(self, text="Clear selected",
+                                command=self.clearFiles)
         file_button.pack()
 
         next_button = tk.Button(self, text="Next",
                                 command=lambda: controller.show_frame("CodePage"))
         next_button.pack()
 
-    # Select files to be sorted
+        label = tk.Label(self, text="")
+        label.pack()
+
+    # Select individual files to be sorted
+    def addFiles(self):
+        user = getpass.getuser()
+        '''
+        temp = askopenfilenames(initialdir='C:/Users/%s' % user)
+        for filename in temp:
+            if filename not in self.controller.files:
+                self.selected_list.insert('end', filename)
+                self.controller.files.append(filename)
+        '''
+        filename = filedialog.askopenfilename(initialdir='C:/Users/%s' % user)
+        if filename not in self.controller.files:
+            self.selected_list.insert('end', filename)
+            self.controller.files.append(filename)
+
+    # Select folders to be sorted
+    def addFolders(self):
+        user = getpass.getuser()
+
+        '''
+        temp = askopendirnames(initialdir='C:/Users/%s' % user)
+        for dirname in temp:
+            filelist = os.listdir(dirname)
+            for filename in filelist:
+                if filename not in self.controller.files:
+                    self.selected_list.insert('end', os.path.join(dirname, filename))
+         
+                    self.controller.files.append(os.path.join(dirname, filename))
+        '''
+
+        temp = filedialog.askdirectory(initialdir='C:/Users/%s' % user)
+        filelist = os.scandir(temp)
+        for filename in filelist:
+            if filename not in self.controller.files:
+                self.selected_list.insert('end', (temp + '/' + filename.name))
+                self.controller.files.append(temp + '/' + filename.name)
+
+    ''' original
     def addFiles(self):
         user = getpass.getuser()
         temp = askopendirnames(initialdir='C:/Users/%s' % user)
@@ -78,7 +126,7 @@ class StartPage(tk.Frame):
             if filename not in self.controller.files:
                 self.selected_list.insert('end', filename)
                 self.controller.files.append(filename)
-
+    '''
 
     # Remove selected files
     def removeFile(self):
@@ -91,6 +139,13 @@ class StartPage(tk.Frame):
         try:
             self.selected_list.delete(selected[0])
             self.controller.files.remove(value)
+        except:
+            print("Error removing file from files list")
+
+    def clearFiles(self):
+        self.controller.files.clear()
+        try:
+            self.selected_list.delete(0,'end')
         except:
             print("Error removing file from files list")
 
@@ -158,12 +213,12 @@ class CodePage(tk.Frame):
 
     # Set destination directoy
     def getDestDir(self):
-        self.controller.destFile = filedialog.askdirectory()
+        user = getpass.getuser()
+        self.controller.destFile = filedialog.askdirectory(initialdir='C:/Users/%s' % user, title = "Select Destination Dir")
         self.dest_entry.configure(state="normal")
         self.dest_entry.delete(0, 'end')
-        self.dest_entry.insert('0', self.controller.destFile)
+        self.dest_entry.insert(0, self.controller.destFile)
         self.dest_entry.configure(state="readonly")
-        
         # Check if destination selection was canceled
         if self.controller.destFile:
             return
@@ -174,9 +229,9 @@ class CodePage(tk.Frame):
     def saveScript(self):
         try:
             path = os.getcwd() + "\scripts"
-            filename = filedialog.asksaveasfilename(initialdir = path, title = "Select save file", filetypes = (("text files","*.txt"),("all files","*.*")))
+            filename = filedialog.asksaveasfilename(initialdir = path, initialfile = 'script.txt', title = "Select save file", filetypes = (("text files", "*.txt"), ("all files", "*.*")))
             with open(filename, 'w') as f:
-                scriptCode = str(self.code.get(1.0, 'end'))
+                scriptCode = self.code.get(0.0, 'end')
                 f.write(scriptCode)
                 f.close()
         except FileNotFoundError:
@@ -187,11 +242,11 @@ class CodePage(tk.Frame):
     def loadScript(self):
         try:
             path = os.getcwd() + "\scripts"
-            self.code.delete(1.0, 'end')
-            filename = filedialog.askopenfilename(initialdir = path, title = "Select script to load", filetypes = (("text files","*.txt"),("all files","*.*")))
+            self.code.delete(0.0, 'end')
+            filename = filedialog.askopenfilename(initialdir = path, title = "Select script to load", filetypes = (("text files", "*.txt"), ("all files", "*.*")))
             with open(filename, 'r') as f:
                 scriptCode = f.read()
-                self.code.insert('end', scriptCode)
+                self.code.insert(0.0, scriptCode)
                 f.close()
         except FileNotFoundError:
             print("File selection was canceled")
@@ -207,11 +262,11 @@ class CodePage(tk.Frame):
         elif len(self.controller.files) == 0:
             print("Select some files to be sorted")  # Added popup error message for this
         else:
-            print("run script")
             Process = Interpreter.LexicalAnalyzer(self.controller.destFile, self.controller.files)
             Script = self.code.get(0.0, tk.END)  # get all text in box
             Process.parseTokens(Script)
-        return
+            self.controller.show_frame("StartPage")
+            #todo: clear files selected
 
 
 
