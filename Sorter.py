@@ -26,6 +26,8 @@ class sorter:
                     boolstack = boolstack and (re.match(r'^%s\.[^.]*' % reg, name))
                 elif x[0] == 6:
                     boolstack = boolstack and (not re.match(r'^%s\.[^.]*' % reg, name))
+                elif x[0] == 5:
+                    boolstack = boolstack and (re.match(r'%s\.[^.]*' % reg, name))
                 else:
                     boolstack = False
         return boolstack
@@ -39,7 +41,6 @@ class sorter:
             if x[0] == 0:
                 for y in self.files:
                     if self.stackif(y, opstack):
-                        print('moved', y, 'to', self.dest + x[1])
                         try:
                             os.mkdir(self.dest + x[1])
                         except:
@@ -47,11 +48,7 @@ class sorter:
                         try:
                             os.rename(y, (self.dest + x[1] + os.path.basename(y)))
                         except:
-                            print('failed to move', y, 'to', self.dest + x[1])
-                            self.files.remove(y)
-                        self.files.remove(y)
-                    else:
-                        print(y, 'not moved to', self.dest + x[1])
+                            pass
                 opstack.pop(-1)
             else:
                 opstack.append(x)

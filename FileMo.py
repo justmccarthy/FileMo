@@ -84,13 +84,6 @@ class StartPage(tk.Frame):
     # Select individual files to be sorted
     def addFiles(self):
         user = getpass.getuser()
-        '''
-        temp = askopenfilenames(initialdir='C:/Users/%s' % user)
-        for filename in temp:
-            if filename not in self.controller.files:
-                self.selected_list.insert('end', filename)
-                self.controller.files.append(filename)
-        '''
         filename = filedialog.askopenfilename(initialdir='C:/Users/%s' % user)
         if filename not in self.controller.files:
             self.selected_list.insert('end', filename)
@@ -100,16 +93,6 @@ class StartPage(tk.Frame):
     def addFolders(self):
         user = getpass.getuser()
 
-        '''
-        temp = askopendirnames(initialdir='C:/Users/%s' % user)
-        for dirname in temp:
-            filelist = os.listdir(dirname)
-            for filename in filelist:
-                if filename not in self.controller.files:
-                    self.selected_list.insert('end', os.path.join(dirname, filename))
-         
-                    self.controller.files.append(os.path.join(dirname, filename))
-        '''
 
         temp = filedialog.askdirectory(initialdir='C:/Users/%s' % user)
         filelist = os.scandir(temp)
@@ -117,16 +100,6 @@ class StartPage(tk.Frame):
             if filename not in self.controller.files:
                 self.selected_list.insert('end', (temp + '/' + filename.name))
                 self.controller.files.append(temp + '/' + filename.name)
-
-    ''' original
-    def addFiles(self):
-        user = getpass.getuser()
-        temp = askopendirnames(initialdir='C:/Users/%s' % user)
-        for filename in temp:
-            if filename not in self.controller.files:
-                self.selected_list.insert('end', filename)
-                self.controller.files.append(filename)
-    '''
 
     # Remove selected files
     def removeFile(self):

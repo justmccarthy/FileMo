@@ -69,8 +69,6 @@ class LexicalAnalyzer:
                         break
                 if identified == False:
                     TokenTypes.append(("shortstring", x))
-                    # print("unrecognized token", x)
-                    # return
 
         self._BuildOps(TokenTypes)
 
