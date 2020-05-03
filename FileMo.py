@@ -1,6 +1,7 @@
 import os, getpass, Interpreter
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 # from tkfilebrowser import askopendirnames, askopenfilenames # not in python installations by default
 
 class SampleApp(tk.Tk):
@@ -84,22 +85,43 @@ class StartPage(tk.Frame):
     # Select individual files to be sorted
     def addFiles(self):
         user = getpass.getuser()
-        filename = filedialog.askopenfilename(initialdir='C:/Users/%s' % user)
-        if filename not in self.controller.files:
-            self.selected_list.insert('end', filename)
-            self.controller.files.append(filename)
+        filelist = tk.filedialog.askopenfilename(initialdir='C:/Users/%s' % user, multiple=True)
+        for filename in filelist:
+            if filename not in self.controller.files:
+                try:
+                    self.selected_list.insert('end', (filename))
+                    self.controller.files.append(filename)
+                except:
+                    print("could not add: " + filename)
 
     # Select folders to be sorted
     def addFolders(self):
-        user = getpass.getuser()
+        user = getpass.getuser().lower()
+        folder = filedialog.askdirectory(initialdir='C:/Users/' + user)
+        if (folder == ''):
+            return
+        confirm = messagebox.askyesno('Confirm', 'Are you sure you want to sort from: ' + folder + '?')
+        if not confirm:
+            return
+        self.addFolder(folder)
 
-
-        temp = filedialog.askdirectory(initialdir='C:/Users/%s' % user)
-        filelist = os.scandir(temp)
+    # add folder to list calls self recursively for sub folders
+    def addFolder(self, folder):
+        try:
+            filelist = os.scandir(folder)
+        except:
+            messagebox.showwarning("Access Denied", "Can't Access " + folder)
+            return
         for filename in filelist:
-            if filename not in self.controller.files:
-                self.selected_list.insert('end', (temp + '/' + filename.name))
-                self.controller.files.append(temp + '/' + filename.name)
+            if os.path.isfile(folder + '/' + filename.name):
+                if filename not in self.controller.files:
+                    try:
+                        self.selected_list.insert('end', (folder + '/' + filename.name))
+                        self.controller.files.append(folder + '/' + filename.name)
+                    except:
+                        print("could not add: " + folder + '/' + filename.name)
+            elif os.path.isdir(folder + '/' + filename.name):
+                self.addFolder(folder + '/' + filename.name)
 
     # Remove selected files
     def removeFile(self):
