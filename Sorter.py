@@ -1,4 +1,4 @@
-import os, shutil, re
+import os #shutil, re
 
 class sorter:
     ifstack = []
@@ -14,41 +14,69 @@ class sorter:
 
     def stackif(self, file, ops):
         boolstack = True
+        state = False
         for x in ops:
-            if x[1] == 'type' and x[3][0] == 'shortstring':
-                name = os.path.basename(file)
-                reg = x[3][1]
-                boolstack = boolstack and re.match(r'.+\.%s' % reg, name)
-            if x[1] == 'name' and x[3][0] == 'shortstring':
-                name = os.path.basename(file)
-                reg = x[3][1]
-                if x[0] == 1:
-                    boolstack = boolstack and (re.match(r'^%s\.[^.]*' % reg, name))
-                elif x[0] == 6:
-                    boolstack = boolstack and (not re.match(r'^%s\.[^.]*' % reg, name))
-                elif x[0] == 5:
-                    boolstack = boolstack and (re.match(r'%s\.[^.]*' % reg, name))
-                else:
-                    boolstack = False
-        return boolstack
+            if x[1] == 'filename':
+                #name = os.path.basename(file)
+                name = os.path.splitext(file)
+                reg = x[3][1][1:-1]  # strip quotes
+                if x[0] == 'type':
+                    if x[2][0] == 'contains':
+                        if reg == '':
+                            state = True
+                        else:
+                            #state = re.match(r'.*\.\w*%s\w*$' % reg, name)
+                            state = (reg in name[1])
+                    else:
+                        #if reg == '':
+                            #state = not re.match(r'^.+(\.\S+)$' % reg, name)
+                        #else:
+                            #state = re.match(r'.*\.%s$' % reg, name)
+                        state = (reg == name[1])
+
+                elif x[0] == 'name':
+                    if x[2][0] == 'contains':
+                        if reg == '':
+                            state = True
+                        else:
+                            #state = re.match(r'\w*%s\w*(.[^.]+)?$' % reg, name)
+                            state = (reg in name[0])
+                    else:
+                        #state = re.match(r'^%s(.[^.]+)?$' % reg, name)
+                        state = (reg == name[0])
+
+                if x[0] == 6:
+                    state = not state
+            if x[1] == 'medianame':
+                reg = x[3][1][1:-1]  # strip quotes
 
 
 
+        return boolstack and state
 
     def sortif(self):
         opstack = []
         for x in self.opfeed:
             if x[0] == 0:
-                for y in self.files:
-                    if self.stackif(y, opstack):
-                        try:
-                            os.mkdir(self.dest + x[1])
-                        except:
-                            pass
-                        try:
-                            os.rename(y, (self.dest + x[1] + os.path.basename(y)))
-                        except:
-                            pass
-                opstack.pop(-1)
+                if opstack[i][1] == 'endline':  #
+                    opstack.append(x)
+                elif opstack[i][1] == 'clear':  # clear if stack
+                    i = len(opstack) - 1
+                    while i >= 0:
+                        opstack.pop(i)
+                elif opstack[i][1] == 'path':
+                    for y in self.files:
+                        if self.stackif(y, opstack):  # do if stack on file
+                            try:
+                                os.mkdir(self.dest + x[1])  # make directory
+                            except:
+                                pass  # directory already exists
+                            try:
+                                os.rename(y, (self.dest + x[1] + os.path.basename(y)))
+                            except:
+                                pass
+                    i = len(opstack) - 1
+                    while (i >= 0 and opstack[i][1] == 'endline'):
+                        opstack.pop(i)
             else:
                 opstack.append(x)

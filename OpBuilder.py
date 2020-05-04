@@ -1,7 +1,7 @@
 import Sorter, Interpreter
 
 class OpBuild:
-    # Reserved = Interpreter.Reserved
+    Reserved = Interpreter.Reserved
     Dest = ''
     SortFiles = []
 
@@ -10,66 +10,73 @@ class OpBuild:
         self.SortFiles = SortFilesIn  # hold list of files to sort to pass to sorter
 
     # noinspection PyUnreachableCode
-    def BuildOps(self, TokenType):
+    def BuildOps(self, TokenType):  #check syntax and build operation
         opList = []
         state = 0
-        # print(TokenType)
-        opbuilder = [0, '', '', '', '']
+
+        opbuilder = [0, '', '', '', '']  # [operator, operand 1, mod 1, operand 2, mod 2]
+
         for x in TokenType:
-            # print (x, state) # debug
+
             # path statement
             if (x[0] == "path") and (state == 0):
                 state = 1
                 opbuilder[0] = 0
                 opbuilder[1] = x[1]
 
-            # if statement
-            # elif (x[0] == "not") and (state == 0):
-            #     state = 2
-            #     opbuilder[0] = 10
-
-            elif (x[0] == "meta") and ((state == 0) or (state == 2)):
-                state = 3
+            # if filename(.modname)(!)=string
+            # name
+            elif (x[0] == "filename") and (state == 0):
+                state = 2
                 opbuilder[1] = x[1]
-
-            # if type1: meta =
-            elif (x[0] == "inv") and (state == 3):
-                opbuilder[0] = 6
+            # name(.)
+            elif (x[0] == "dot") and (state == 2):
+                state = 3
+            # name(.modname)
+            elif (x[0] == "modname") and (state == 3):
+                opbuilder[1] = x[2]
                 state = 4
-
-            elif (x[0] == "expression") and ((state == 3) or (state == 4)):
-                if x[1] == '=':
-                    if opbuilder[0] != 6:
-                        opbuilder[0] = 1
-                elif x[1] == '>=':
-                    if opbuilder[0] == 6:
-                        opbuilder[0] = 3
-                    else:
-                        opbuilder[0] = 2
-                elif x[1] == '<':
-                    if opbuilder[0] == 6:
-                        opbuilder[0] = 2
-                    else:
-                        opbuilder[0] = 3
-                elif x[1] == '<=':
-                    if opbuilder[0] == 6:
-                        opbuilder[0] = 5
-                    else:
-                        opbuilder[0] = 4
-                elif x[1] == '>':
-                    if opbuilder[0] == 6:
-                        opbuilder[0] = 4
-                    else:
-                        opbuilder[0] = 5
-
+            # name(.modname)(!)
+            elif (x[0] == "inv") and (state == 4):
+                opbuilder[0] = 6
                 state = 5
-
-            elif ((x[0] == "string") or (x[0] == "shortstring") or (x[0] == "size")) and (state == 5):
+            # name(.modname)(!)=
+            elif (x[1] == "=") and ((state == 2) or (state == 4) or (state == 5)):
+                mod = False
+                if opbuilder[0] == 6:
+                    mod = True
+                opbuilder[0] = self.GetEquiv(x[1],mod)
                 state = 6
+            # name(.modname)(!)= string
+            elif (x[0] == "string") and (state == 6):
+                state = 7
                 opbuilder[3] = x
 
-            # Blocked off for demo
-            # if type2 meta.attr = meta.attr
+            # if filesize = size
+            # filesize
+            elif (x[0] == "filesize") and (state == 0):
+                state = 8
+                opbuilder[3] = x
+            # filesize (!)
+            elif (x[0] == "inv") and (state == 8):
+                opbuilder[0] = 6
+                state = 9
+            # filesize(!)=
+            elif (x[0] == "equivalence") and ((state == 8) or (state == 9)):
+                mod = False
+                if opbuilder[0] == 6:
+                    mod = True
+                opbuilder[0] = self.GetEquiv(x[1], mod)
+                state = 10
+            # filesize (!)= size
+            elif (x[0] == "size") and (state == 10):
+                state = 11
+                opbuilder[3] = x
+
+            #todo: filetime and media syntax
+
+            # if filetime
+            #
             elif (x[0] == "dot") and (state == 3):
                 state = 7
                 opbuilder.append(x)
@@ -85,7 +92,7 @@ class OpBuild:
                     opbuilder[0] = 10
                 state = 9
 
-            elif (x[0] == "expression") and ((state == 8) or (state == 9)):
+            elif (x[0] == "equivalence") and ((state == 8) or (state == 9)):
                 state = 10
                 opbuilder.append(x)
             elif (x[0] == 'meta') and (state == 10):
@@ -98,17 +105,22 @@ class OpBuild:
                 state = 13
                 opbuilder.append(x)
 
+
             # end if
-            elif (x[0] == "endif") and ((state == 6) or (state == 13)):
-                state = 14
+            elif (x[0] == "endif") and ((state == 7) or (state == 11)):
+                opList.append(opbuilder)
+                opbuilder = [0, '', '', '', '']
+                state = 0
 
             # end line
-            elif (x[0] == "endline") and ((state == 1) or (state == 14)):
+            elif (x[0] == "endline") and ((state == 1)):
                 state = 0
                 opList.append(opbuilder)
                 opbuilder = [0, '', '', '', '']
-
             elif x[0] == "endline" and state == 0:
+                opbuilder[1] = x
+                opList.append(opbuilder)
+                opbuilder = [0, '', '', '', '']
                 state = 0
 
             else:
@@ -116,3 +128,33 @@ class OpBuild:
                 print("state = ", state)
                 return
         Sorter.sorter(opList, self.Dest, self.SortFiles)
+
+    def GetEquiv(self, symbol, mod = False):
+
+        if symbol == '=':     # 1 is =, 6 is !=
+            if mod:
+                return 6
+            else:
+                return 1
+        elif symbol == '>=':  # 2 is >=
+            if mod:
+                return 3
+            else:
+                return 2
+        elif symbol == '<':   # 3 is <
+            if mod:
+                return 2
+            else:
+                return 3
+        elif symbol == '<=':  # 4 is <=
+            if mod:
+                return 5
+            else:
+                return 4
+        elif symbol == '>':   # 5 is >
+            if mod:
+                return 4
+            else:
+                return 5
+        else:
+            return 7          # 7 is invalid symbol
