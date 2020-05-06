@@ -60,7 +60,7 @@ class sorter:
                 except:
                     state = False
 
-            elif x[1][0] == 'fileTime':
+            elif x[1][0] == 'filetime':
                 if x[3][0] == 'time':
                     try:
                         # extract int from user date
