@@ -1,11 +1,14 @@
 # FileMo
 CS441 group project  
-* all ifs end in a :
+
 ## format:
-* path format: /path/
+* all ifs end in a :
+
+### path format: /path/
 	* ex:
 		* /files/
 		* /long/files/
+		* /memes/jpg/
 
 ### name filtering:
 * exact match
