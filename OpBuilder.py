@@ -39,7 +39,7 @@ class OpBuild:
                 opbuilder[2] = x
                 state = 4
             # name(.modname)(!)
-            elif (x[0] == "inv") and (state == 4):
+            elif (x[0] == "inv") and (state == 4 or state == 2):
                 opbuilder[0] = 6
                 state = 5
             # name(.modname)(!)=

@@ -1,9 +1,9 @@
-name = sort:
+name = 'sort':
 	/sort/
-type = txt:
+type = 'txt':
 	/txt/
-type = png:
-	name != this:
+type = 'png':
+	name != 'this':
 		/not this png/
-	name = this:
+	name = 'this':
 		/this png/

@@ -3,16 +3,16 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 class sorter:
-    ifstack = []
-    opfeed = []
-    files = []
-    dest = ''
+    ifstack = []  # stores
+    opfeed = []  # oplist storage
+    files = []  # file list storage
+    dest = ''  # dest directory storage
 
     def __init__(self, oplist, dest, filelist):
-        self.opfeed = oplist
-        self.files = filelist
-        self.dest = dest
-        self.sortif()
+        self.opfeed = oplist  # get oplist
+        self.files = filelist  # get filelist
+        self.dest = dest  # set file dest directory
+        self.sortif()  #do sort if
 
     def stackif(self, file, ops):
         boolstack = True
