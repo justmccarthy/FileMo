@@ -31,7 +31,7 @@ class sorter:
                     else:
                         state = (reg in name)
                 else:
-                    state = (reg == name)
+                    state = (reg == name.lower())
                 if x[0] == 6:
                     state = not state
 
