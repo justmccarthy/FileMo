@@ -14,19 +14,15 @@ class LexicalAnalyzer:
         ('modifydate', 'filetime'),
         ('createdate', 'filetime'),
         ('accessdate', 'filetime'),
-        ('year', 'modtime'),
-        ('month', 'modtime'),
-        ('day', 'modtime'),
-        ('hour', 'modtime'),
-        ('minute', 'modtime'),
-        ('second', 'modtime'),  # pretty useless
+        ('ago', 'modtime'),
+        ('fromnow', 'modtime'),  # i know its useless
         # audio/video file
         ('title', 'metaname'),  # music / video(name)
         ('author', 'metaname'),  # music / video(name)
         ('artist', 'metaname'),  # music / video(name)
         ('length', 'metatime'),  # music / video(time)
         # file misc
-        ('tag', 'metaname'),  # user file tag
+        # ('tag', 'metaname'),  # user file tag
         # clear
         ('clear', 'clear'),
         # simple items
@@ -60,7 +56,7 @@ class LexicalAnalyzer:
                 TokenTypes.append(("string", x))
             elif re.match(r'\b\d+[kmgt]?[b]\b', x):  # size in bytes or k/m/g/t bytes
                 TokenTypes.append(("size", x))
-            elif re.match(r'\b\d+[smhdyc]\b', x):  # time in second, minutes, hours, days, years, centuries(lol)
+            elif re.match(r'\b\d+(mn|[smhdyc])\b', x):  # time in Seconds, MiNutes, Hours, Days, Months, Years, Century (very pointless)
                 TokenTypes.append(("time", x))
             else:  # specific / simple definitions
                 identified = False
