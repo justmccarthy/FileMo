@@ -35,6 +35,7 @@ class sorter:
                 if x[0] == 6:
                     state = not state
 
+
             elif x[1][0] == 'medianame':
                 try:
                     reg = x[3][1][1:-1]  # strip quotes

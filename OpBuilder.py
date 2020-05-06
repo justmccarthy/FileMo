@@ -75,23 +75,23 @@ class OpBuild:
                 state = 7
                 opbuilder[3] = x
 
-            # if filetime(.modtime) (!)= time
+            # if filetime(!)= time
             # filetime
             elif x[0] == "filetime" and (state == 0):
+                opbuilder[1] = x
                 state = 12
-                opbuilder.append(x)
-            # filetime(.modname)(!)
+            # filetime(!)
             elif (x[0] == "inv") and (state == 12):
                 opbuilder[0] = 6
                 state = 15
-            # filetime(.modname)(!)=
+            # filetime(!)=
             elif (x[0] == "equivalence") and (state == 15 or state == 12):
                 mod = False
                 if opbuilder[0] == 6:
                     mod = True
                 opbuilder[0] = self.GetEquiv(x[1], mod)
                 state = 16
-            # filetime(.modname)(!)= date
+            # filetime(!)= date
             elif (x[0] == "time" or x[0] == "date") and (state == 16):
                 state = 7
                 opbuilder[3] = x
