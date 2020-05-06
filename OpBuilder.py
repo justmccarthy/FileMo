@@ -74,7 +74,7 @@ class OpBuild:
 
             # if filetime(.modtime) (!)= time
             # filetime
-            elif x[0] == "filetime" and (state == 3):
+            elif x[0] == "filetime" and (state == 0):
                 state = 12
                 opbuilder.append(x)
             # filetime(.modname)(!)
@@ -82,7 +82,7 @@ class OpBuild:
                 opbuilder[0] = 6
                 state = 15
             # filetime(.modname)(!)=
-            elif (x[1] == "equivalence") and (state == 15):
+            elif (x[0] == "equivalence") and (state == 15 or state == 12):
                 mod = False
                 if opbuilder[0] == 6:
                     mod = True
@@ -113,8 +113,8 @@ class OpBuild:
                 state = 0
 
             else:
-                print("error: bad syntax at:", x[1])
-                print("state = ", state)
+                print("error: bad syntax at:", x)
+                # print(state)
                 return
         Sorter.sorter(opList, self.Dest, self.SortFiles)
 

@@ -67,7 +67,7 @@ class LexicalAnalyzer:
                         break
                 if not identified:
                     #TokenTypes.append(("shortstring", x))
-                    print('error, cnat identify:' + x)
+                    print('error, cant identify:' + x)
 
         self.builder.BuildOps(TokenTypes)
 
