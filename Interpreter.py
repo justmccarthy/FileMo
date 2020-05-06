@@ -14,19 +14,12 @@ class LexicalAnalyzer:
         ('modifydate', 'filetime'),
         ('createdate', 'filetime'),
         ('accessdate', 'filetime'),
-        ('year', 'modtime'),
-        ('month', 'modtime'),
-        ('day', 'modtime'),
-        ('hour', 'modtime'),
-        ('minute', 'modtime'),
-        ('second', 'modtime'),  # pretty useless
         # audio/video file
         ('title', 'metaname'),  # music / video(name)
         ('author', 'metaname'),  # music / video(name)
         ('artist', 'metaname'),  # music / video(name)
-        ('length', 'metatime'),  # music / video(time)
         # file misc
-        ('tag', 'metaname'),  # user file tag
+        # ('tag', 'metaname'),  # user file tag
         # clear
         ('clear', 'clear'),
         # simple items
@@ -41,7 +34,7 @@ class LexicalAnalyzer:
 
     def parseTokens(self, strin):
         strin = strin.lower()  # were not doing case sensitivity
-        Tokens = re.split(r'(?:(\".+?\")|(\'.+?\')|(\B\\.+\\(\B|\b))|(\B\/.+\/(\B|\b))|(\<\=)|(\>\=)|(\b\w+\b)|([\.\<\>\=\:\!\n\t]))', strin) # defines what tokens can look like and split accordingly
+        Tokens = re.split(r'(?:(\".+?\")|(\'.+?\')|(\B\\.+\\(\B|\b))|(\B\/.+\/(\B|\b))|(\d\d\-\d\d\-\d\d\d\d)|(\<\=)|(\>\=)|(\b\w+\b)|([\.\<\>\=\:\!\n\t]))', strin) # defines what tokens can look like and split accordingly
         Tokens = list(filter(None, Tokens))  # re.split used in on big regex like this causes a empty variables to to be added, this filters them out
         self._IdentifyTokens(Tokens)  # call identify tokens process, pass the token list
 
@@ -60,8 +53,11 @@ class LexicalAnalyzer:
                 TokenTypes.append(("string", x))
             elif re.match(r'\b\d+[kmgt]?[b]\b', x):  # size in bytes or k/m/g/t bytes
                 TokenTypes.append(("size", x))
-            elif re.match(r'\b\d+[smhdyc]\b', x):  # time in second, minutes, hours, days, years, centuries(lol)
+            elif re.match(r'\b\d+(mn|[smhdy])\b', x):  # time in Seconds, MiNutes, Hours, Days, Months, Years, Century (very pointless)
                 TokenTypes.append(("time", x))
+            elif re.match(r'\b\d\d\-\d\d\-\d\d\d\d\b',x):  # date day,month,year use use leading 0 for single digits
+                TokenTypes.append(("date", x))
+
             else:  # specific / simple definitions
                 identified = False
                 for y in self.Reserved:

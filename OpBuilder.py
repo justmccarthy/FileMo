@@ -1,6 +1,7 @@
 import Sorter, Interpreter
 
 class OpBuild:
+<<<<<<< HEAD
     #Reserved = Interpreter.Reserved
     Reserved = [  # if reserved[0] then token is of type reserved[1]
         # file name related
@@ -34,6 +35,8 @@ class OpBuild:
         (':', 'endif')
     ]
     
+=======
+>>>>>>> 3e6dc2faf0f715c2a38e7d3a87580a5c323b0097
     Dest = ''
     SortFiles = []
 
@@ -46,7 +49,7 @@ class OpBuild:
         opList = []
         state = 0
 
-        opbuilder = [0, '', '', '', '']  # [operator, operand 1, mod 1, operand 2, mod 2]
+        opbuilder = [0, '', '', '']  # [operator, operand 1, mod 1, operand 2, mod 2]
 
         for x in TokenType:
 
@@ -58,7 +61,7 @@ class OpBuild:
 
             # if filename(.modname)(!)=string
             # name
-            elif (x[0] == "filename") and (state == 0):
+            elif (x[0] == "filename" or x[0] == "metaname") and (state == 0):
                 state = 2
                 opbuilder[1] = x
             # name(.)
@@ -105,55 +108,44 @@ class OpBuild:
                 state = 11
                 opbuilder[3] = x
 
-            #todo: filetime and media syntax
-
-            # if filetime
-            #
-            elif (x[0] == "dot") and (state == 3):
-                state = 7
-                opbuilder.append(x)
-
-            elif (x[0] == "attr") and (state == 7):
-                state = 8
-                opbuilder.append(x)
-
-            elif (x[0] == "inv") and (state == 8):
-                if opbuilder[0] == 10:
-                    opbuilder[0] = 0
-                else:
-                    opbuilder[0] = 10
-                state = 9
-
-            elif (x[0] == "equivalence") and ((state == 8) or (state == 9)):
-                state = 10
-                opbuilder.append(x)
-            elif (x[0] == 'meta') and (state == 10):
-                state = 11
-                opbuilder.append(x)
-            elif (x[0] == 'dot') and (state == 11):
+            # if filetime(.modtime) (!)= time
+            # filetime
+            elif x[0] == "filetime" and (state == 3):
                 state = 12
                 opbuilder.append(x)
-            elif (x[0] == 'attr') and (state == 12):
-                state = 13
-                opbuilder.append(x)
-
+            # filetime(.modname)(!)
+            elif (x[0] == "inv") and (state == 12):
+                opbuilder[0] = 6
+                state = 15
+            # filetime(.modname)(!)=
+            elif (x[1] == "equivalence") and (state == 15):
+                mod = False
+                if opbuilder[0] == 6:
+                    mod = True
+                opbuilder[0] = self.GetEquiv(x[1], mod)
+                state = 16
+            # filetime(.modname)(!)= date
+            elif (x[0] == "time" or x[0] == "date") and (state == 16):
+                state = 17
+                opbuilder[3] = x
 
             # end if
-            elif (x[0] == "endif") and ((state == 7) or (state == 11)):
+            elif (x[0] == "endif") and ((state == 7) or (state == 11) or (state == 17)):
                 opList.append(opbuilder)
-                opbuilder = [0, '', '', '', '']
+                opbuilder = [0, '', '', '']
                 state = 0
 
-            # end line
+            # end line after path and clear
             elif (x[0] == "endline") and ((state == 1)):
                 state = 0
                 opList.append(opbuilder)
-                opbuilder = [0, '', '', '', '']
+                opbuilder = [0, '', '', '']
+            # end line after if(s)
             elif x[0] == "endline" and state == 0:
                 opbuilder[1] = x
                 opbuilder[0] = 1
                 opList.append(opbuilder)
-                opbuilder = [0, '', '', '', '']
+                opbuilder = [0, '', '', '']
                 state = 0
 
             else:
