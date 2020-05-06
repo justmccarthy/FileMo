@@ -1,6 +1,40 @@
 import Sorter, Interpreter
 
 class OpBuild:
+    #Reserved = Interpreter.Reserved
+    Reserved = [  # if reserved[0] then token is of type reserved[1]
+        # file name related
+        ('name', 'filename'),
+        ('type', 'filename'),
+        ('contains', 'modname'),
+        # file size
+        ('size', 'filesize'),
+        # file time
+        ('modifydate', 'filetime'),
+        ('createdate', 'filetime'),
+        ('accessdate', 'filetime'),
+        ('year', 'modtime'),
+        ('month', 'modtime'),
+        ('day', 'modtime'),
+        ('hour', 'modtime'),
+        ('minute', 'modtime'),
+        ('second', 'modtime'),  # pretty useless
+        # audio/video file
+        ('title', 'metaname'),  # music / video(name)
+        ('author', 'metaname'),  # music / video(name)
+        ('artist', 'metaname'),  # music / video(name)
+        ('length', 'metatime'),  # music / video(time)
+        # file misc
+        ('tag', 'metaname'),  # user file tag
+        # clear
+        ('clear', 'clear'),
+        # simple items
+        ('!', 'inv'),
+        ('.', 'dot'),
+        (':', 'endif')
+    ]
+    
+
     Dest = ''
     SortFiles = []
 

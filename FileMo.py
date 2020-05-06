@@ -1,5 +1,6 @@
 import os, getpass, Interpreter
 import tkinter as tk
+from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
 # from tkfilebrowser import askopendirnames, askopenfilenames # not in python installations by default
@@ -31,6 +32,10 @@ class SampleApp(tk.Tk):
 
         self.show_frame("StartPage")
 
+    
+    def get_page(self, page_name):
+        return self.frames[page_name]
+    
     # Raise specified frame and reset geometry
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
@@ -52,35 +57,56 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
+        f1 = tk.Frame(self)
+        f2 = tk.Frame(self)
+        f3 = tk.Frame(self)
+
+        self.grid_rowconfigure(0, weight=0)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=0)
+        
+        self.grid_columnconfigure(0, weight=0)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(2, weight=0)
+
+        f3.grid_rowconfigure(0, weight=1)
+
+        f3.grid_columnconfigure(0, weight=1)
+
+
         label = tk.Label(self, text="Select files to be sorted")
-        label.pack(side="top", fill="x", pady=10)
+        label.grid(row=0, column=1, sticky = "s")
 
         # Add multiselected delete: add back (selectmode="multiple",)
-        self.selected_list = tk.Listbox(self, height=20, width=50, bg='#ffffff')
-        self.selected_list.pack(padx=15, fill='both')
+        self.selected_list = tk.Listbox(f3, bg='#ffffff', width = 40, height = 30)
+        self.selected_list.grid(row = 0, column = 0, sticky= "nsew")
 
-        file_button = tk.Button(self, text="Select files",
+        file_button = tk.Button(f1, text="Select File(s)",
                                 command=self.addFiles)
-        file_button.pack()
+        file_button.grid(row=0, column=0, pady = 10)
 
-        file_button = tk.Button(self, text="Select folders",
+        file_button = tk.Button(f1, text="Select Folder",
                                 command=self.addFolders)
-        file_button.pack()
+        file_button.grid(row=1, column=0, pady = 10)
 
-        file_button = tk.Button(self, text="Remove selected",
+        file_button = tk.Button(f2, text="Remove Selected",
                                 command=self.removeFile)
-        file_button.pack()
+        file_button.grid(row=0, column=0, pady = 10)
 
-        file_button = tk.Button(self, text="Clear selected",
+        file_button = tk.Button(f2, text="Clear List",
                                 command=self.clearFiles)
-        file_button.pack()
+        file_button.grid(row=1, column=0, pady = 10)
 
         next_button = tk.Button(self, text="Next",
                                 command=lambda: controller.show_frame("CodePage"))
-        next_button.pack()
+        next_button.grid(row=2, column=1, pady = 10)
+
+        f1.grid(row=1, column=0, padx = 10)
+        f2.grid(row=1, column=2, padx = 10, sticky = "e")
+        f3.grid(row=1, column=1, sticky = "nsew")
 
         label = tk.Label(self, text="")
-        label.pack()
+        #label.pack
 
     # Select individual files to be sorted
     def addFiles(self):
@@ -187,24 +213,39 @@ class CodePage(tk.Frame):
         
         # Right Frame
         code_label = tk.Label(right_frame, text="Your code:")
-        code_label.grid(sticky='w')
+        code_label.grid(row = 0, column = 0, sticky='w')
 
         self.code = tk.Text(right_frame, width=70, height=30, bg='#ffffff')
         self.code.grid(row=1, column=0, columnspan=4, rowspan=3, sticky='nsew', pady=(0,10))
 
         dir_button = tk.Button(right_frame, text="Destination Directory", command=self.getDestDir)
-        dir_button.grid(row=4, column=0, sticky='ew')
+        dir_button.grid(row=4, column=0, sticky='ew', padx = (0, 10))
 
+        self.saveDes = BooleanVar()
+        self.saveDes.set(False)
+
+        self.saveCode = BooleanVar()
+        self.saveCode.set(False)
+        
+        self.cbDes = Checkbutton(right_frame, text="Remember Destination Directory", variable = self.saveDes)
+        self.cbDes.grid(row = 5, column = 0, sticky = 'w')
+        self.cbDes.select()
+
+        self.cbCode = Checkbutton(right_frame, text="Remember Written Code", variable = self.saveCode)
+        self.cbCode.grid(row = 0, column = 2, sticky ='e', columnspan = 2)
+        self.cbCode.select()
+        
         self.dest_entry = tk.Entry(right_frame, textvariable=self.controller.destFile, state='readonly', bg='#ffffff')
         self.dest_entry.grid(row=4, column=1, columnspan=2, sticky='we')
 
-        run_button = tk.Button(right_frame, text="Run Script", command=self.runScript)
-        run_button.grid(row=4, column=3, sticky='se')
+        run_button = tk.Button(right_frame, text="Run Script", command = self.runScript)
+        run_button.grid(row=4, column=3, rowspan=2, sticky='ns', padx = (10, 0))
 
         right_frame.grid_rowconfigure(1, weight=3)
         right_frame.grid_columnconfigure(0, weight=1)
         right_frame.grid_columnconfigure(1, weight=2)
         right_frame.grid_columnconfigure(2, weight=2)
+
 
     # Set destination directoy
     def getDestDir(self):
@@ -261,7 +302,17 @@ class CodePage(tk.Frame):
             Script = self.code.get(0.0, tk.END)  # get all text in box
             Process.parseTokens(Script)
             self.controller.show_frame("StartPage")
-            #todo: clear files selected
+            clr = self.controller.get_page("StartPage")
+            clr.clearFiles()
+            if (self.saveCode.get() == False):
+                self.code.delete(1.0, "end")
+            if (self.saveDes.get() == False):
+                self.controller.destFile = ""
+                self.dest_entry.configure(state="normal")
+                self.dest_entry.delete(0, 'end')
+                self.dest_entry.insert(0, self.controller.destFile)
+                self.dest_entry.configure(state="readonly")
+            
 
 
 
