@@ -7,3 +7,6 @@ type = 'png':
 		/not this png/
 	name = 'this':
 		/this png/
+clear
+modifydate = 06-05-2020:
+	/may6/
