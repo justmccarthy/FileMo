@@ -178,9 +178,7 @@ class sorter:
                                 os.rename(y, (self.dest + x[1][1] + os.path.basename(y)))
                             except:
                                 pass
-                    #i = len(opstack)
-                    #while opstack[-1][1][0] == 'endline':
-                        #opstack.pop()
-                    opstack.pop()
+                    if len(opstack) != 0:
+                        opstack.pop()
             else:
                 opstack.append(x)
