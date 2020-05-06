@@ -1,78 +1,78 @@
 # FileMo
 CS441 group project
 
--all ifs end in a :
+- all ifs end in a :
 
-##format:
+## format:
 
--path format: /path/
+- path format: /path/
 
---ex:
+-- ex:
 
----/files/
+--- /files/
 
----/long/files/
+--- /long/files/
 
-###name filtering:
+### name filtering:
 
--exact match
+- exact match
 
---filename (!=,=) string
+-- filename (!=,=) string
 
--match
+- match
 
---filename.contains (!=,=) string
+-- filename.contains (!=,=) string
 
----filename:
+--- filename:
 
----name: compare to file name
+--- name: compare to file name
 
----type: compare to file type
+--- type: compare to file type
 
---string: "user input" or 'user input'
+-- string: "user input" or 'user input'
 
--ex:
+- ex:
 
---name = "hello world":			if file name is hellow world
+-- name = "hello world":			if file name is hellow world
 
---type != 'mp4':					if file type is not mp4
+-- type != 'mp4':					if file type is not mp4
 
---name.contains != 'file':		if filename does not contain the string file
+-- name.contains != 'file':		if filename does not contain the string file
 
-###date filtering:
+### date filtering:
 
--filedate (!=,=,<,<=,>,>=) userdate
+- filedate (!=,=,<,<=,>,>=) userdate
 
---filedate:
+-- filedate:
 
----modifydate
+--- modifydate
 
----createdate
+--- createdate
 
----accessdate
+--- accessdate
 
---userdate:
+-- userdate:
 
----date: dd-mm-yyyy, compare to date
+--- date: dd-mm-yyyy, compare to date
 
----time: integer followed by s(seconds),mn(minutes),h(hours),d(days),m(months),y(years), copare to time ago
+--- time: integer followed by s(seconds),mn(minutes),h(hours),d(days),m(months),y(years), copare to time ago
 
--ex:
+- ex:
 
---modifydate > 19-01-2005:		if file modifydate since jan 19 2005
+-- modifydate > 19-01-2005:		if file modifydate since jan 19 2005
 
---createdate != 35d:				if file createdate not 35 days ago
+-- createdate != 35d:				if file createdate not 35 days ago
 
-###size filtering:
+### size filtering:
 
--size (!=,=,<,<=,>,>=) usersize
+- size (!=,=,<,<=,>,>=) usersize
 
---size
+-- size
 
---usersize: integer followed by b(bytes),kb(kilobytes),mb(megabytes),gb(gigabytes),tb(terrabytes)
+-- usersize: integer followed by b(bytes),kb(kilobytes),mb(megabytes),gb(gigabytes),tb(terrabytes)
 
--ex:
+- ex:
 
---size <= 234mb:		if file less than or equal to 234 megabytes
+-- size <= 234mb:		if file less than or equal to 234 megabytes
 
---size > gb:			if file greater than 4 gigabytes
+-- size > gb:			if file greater than 4 gigabytes
