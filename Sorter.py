@@ -1,5 +1,6 @@
-import os, time, re#, eyed3  # pip install eyed3
+import os, re, eyed3  # pip install eyed3
 from datetime import datetime, timedelta
+from pathlib import Path
 
 class sorter:
     ifstack = []
@@ -19,12 +20,12 @@ class sorter:
         for x in ops:  # if there is no ops returns true
             if x[1][0] == 'filename':
                 reg = x[3][1][1:-1]  # strip quotes
-                name = os.path.splitext(file)
-                if x[1][0] == 'type':
-                    name = name[1]
-                elif x[1][0] == 'name':
+                name = os.path.splitext(os.path.basename(file))
+                if x[1][1] == 'type':
+                    name = name[1][1:]
+                elif x[1][1] == 'name':
                     name = name[0]
-                if x[2][0] == 'contains':
+                if x[2] != '':
                     if reg == '':
                         state = True
                     else:
@@ -35,30 +36,34 @@ class sorter:
                     state = not state
 
             elif x[1][0] == 'medianame':
-                reg = x[3][1][1:-1]  # strip quotes
-                if x[1][1] == "title":
-                    mp3 = eyed3.load(file)
-                    name = mp3.tag.getTitle()
-                elif x[1][1] == "artist":
-                    mp3 = eyed3.load(file)
-                    name = mp3.tag.getArtist()
-                elif x[1][1] == "author":
-                    name = os.stat(file).st_uid
-                if x[2][0] == 'contains':
-                    if reg == '':
-                        state = True
+                try:
+                    reg = x[3][1][1:-1]  # strip quotes
+                    name = ''
+                    if x[1][1] == "title":
+                        mp3 = eyed3.load(file)
+                        name = mp3.tag.getTitle().lower()
+                    elif x[1][1] == "artist":
+                        mp3 = eyed3.load(file)
+                        name = mp3.tag.getArtist().lower()
+                    elif x[1][1] == "author":
+                        name = os.stat(file).st_uid.lower()
+                    if x[2] != '':
+                        if reg == '':
+                            state = True
+                        else:
+                            state = (reg in name)
                     else:
-                        state = (reg in name)
-                else:
-                    state = (reg == name)
-                if x[0] == 6:
-                    state = not state
+                        state = (reg == name)
+                    if x[0] == 6:
+                        state = not state
+                except:
+                    state = False
 
             elif x[1][0] == 'fileTime':
                 if x[3][0] == 'time':
                     try:
                         # extract int from user date
-                        usertime = int(re.search(r'\d+', x[3]).group())
+                        usertime = int(re.search(r'\d+', x[3][1]).group())
                         if 's' in x[3][1]:
                             usertime = timedelta(seconds=usertime)
                         elif 'mn' in x[3][1]:
@@ -78,6 +83,8 @@ class sorter:
                             filetime = datetime.fromtimestamp(os.path.getctime(file))
                         elif x[1][1] == 'accessdate':
                             filetime = datetime.fromtimestamp(os.path.getatime(file))
+                        else:
+                            x[0] = 0
                         # do compare
                         if x[0] == 1:
                             state = filetime.date() == (datetime.today() - usertime).date()
@@ -91,6 +98,8 @@ class sorter:
                             state = filetime > datetime.today() - usertime
                         elif x[0] == 6:
                             state = filetime.date() != (datetime.today() - usertime).date()
+                        else:
+                            state = False
                     except:
                         print('invalid date')
                         state = False
@@ -122,7 +131,7 @@ class sorter:
 
             elif x[1][0] == 'filesize':
                 filesize = os.path.getsize(file)
-                usersize = int(re.search(r'\d+', x[3]).group())
+                usersize = int(re.search(r'\d+', x[3][1]).group())
                 mult = 1
                 if 'kb' in x[3][1]:
                     mult = 1024
@@ -144,32 +153,29 @@ class sorter:
                     state = filesize > usersize * mult
                 elif x[0] == 6:
                     state = filesize != usersize * mult
-            else:
-                state = False  # if op is unrecognized returns false
-
         return boolstack and state
 
     def sortif(self):
         opstack = []
         for x in self.opfeed:
             if x[0] == 0:
-                if opstack[i][1][0] == 'clear':  # clear if stack
-                    i = len(opstack) - 1
-                    while i >= 0:
-                        opstack.pop(i)
-                elif opstack[i][0] == 'path':
+                if x[1][0] == 'clear':  # clear if stack
+                    i = 0
+                    while len(opstack) > 0:
+                        opstack.pop()
+                elif x[1][0] == 'path':
                     for y in self.files:
                         if self.stackif(y, opstack):  # do if stack on file
                             try:
-                                os.mkdir(self.dest + x[1])  # make directory
-                            except:
-                                pass  # directory already exists
-                            try:
-                                os.rename(y, (self.dest + x[1] + os.path.basename(y)))
+                                Path(self.dest + x[1][1]).mkdir(parents=True, exist_ok=True)  # make directory
                             except:
                                 pass
-                    i = len(opstack) - 1
-                    while i >= 0 and opstack[i][1][0] == 'endline':
-                        opstack.pop(i)
+                            try:
+                                os.rename(y, (self.dest + x[1][1] + os.path.basename(y)))
+                            except:
+                                pass
+                    i = len(opstack)
+                    while opstack[-1][1][0] == 'endline':
+                        opstack.pop()
             else:
                 opstack.append(x)
