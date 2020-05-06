@@ -1,7 +1,6 @@
 import Sorter, Interpreter
 
 class OpBuild:
-<<<<<<< HEAD
     #Reserved = Interpreter.Reserved
     Reserved = [  # if reserved[0] then token is of type reserved[1]
         # file name related
@@ -35,8 +34,7 @@ class OpBuild:
         (':', 'endif')
     ]
     
-=======
->>>>>>> 3e6dc2faf0f715c2a38e7d3a87580a5c323b0097
+
     Dest = ''
     SortFiles = []
 

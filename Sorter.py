@@ -1,4 +1,4 @@
-import os, time, re, eyed3  # pip install eyed3
+import os, time, re#, eyed3  # pip install eyed3
 from datetime import datetime, timedelta
 
 class sorter:
