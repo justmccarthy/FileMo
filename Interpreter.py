@@ -18,8 +18,6 @@ class LexicalAnalyzer:
         ('title', 'metaname'),  # music / video(name)
         ('author', 'metaname'),  # music / video(name)
         ('artist', 'metaname'),  # music / video(name)
-        # file misc
-        # ('tag', 'metaname'),  # user file tag
         # clear
         ('clear', 'clear'),
         # simple items
