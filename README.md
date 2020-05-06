@@ -3,12 +3,13 @@ CS441 group project
 
 all ifs end in a :
 
+##format:
 path format: /path/
 	ex:
 		/files/
 		/long/files/
 
-name filtering:
+###name filtering:
 	exact match
 		filename (!=,=) string
 	match
@@ -21,7 +22,7 @@ name filtering:
 		name = "hello world":			if file name is hellow world
 		type != 'mp4':					if file type is not mp4
 		name.contains != 'file':		if filename does not contain the string file
-date filtering:
+###date filtering:
 	filedate (!=,=,<,<=,>,>=) userdate
 	filedate:
 		modifydate
@@ -33,7 +34,7 @@ date filtering:
 	ex:
 		modifydate > 19-01-2005:		if file modifydate since jan 19 2005
 		createdate != 35d:				if file createdate not 35 days ago
-size filtering:
+###size filtering:
 		size (!=,=,<,<=,>,>=) usersize
 	size
 	usersize: integer followed by b(bytes),kb(kilobytes),mb(megabytes),gb(gigabytes),tb(terrabytes)
