@@ -17,9 +17,12 @@ CS441 group project
 			* type: compare to file type
 		* string: "user input" or 'user input'
 * ex:
-	* name = "hello world":			if file name is hellow world
-	* type != 'mp4':					if file type is not mp4
-	* name.contains != 'file':		if filename does not contain the string file
+	* name = "hello world":			
+		* if file name is hellow world
+	* type != 'mp4':
+		* if file type is not mp4
+	* name.contains != 'file': 
+		* if filename does not contain the string file
 
 ### date filtering:
 * filedate (!=,=,<,<=,>,>=) userdate
@@ -31,8 +34,10 @@ CS441 group project
 		* date: mm-dd-yyyy, compare to date, leading 0 on single digit dates
 		* time: integer followed by s(seconds),mn(minutes),h(hours),d(days),m(months),y(years), copare to time ago
 * ex:
-	* modifydate > 01-19-2005:⇥⇥if file modifydate since jan 19 2005
-	* createdate != 35d:⇥⇥if file createdate not 35 days ago
+	* modifydate > 01-19-2005:
+		* if file modifydate since jan 19 2005
+	* createdate != 35d: 
+		* if file createdate not 35 days ago
 
 ### size filtering:
 
@@ -40,5 +45,7 @@ CS441 group project
 	* size
 	* usersize: integer followed by b(bytes),kb(kilobytes),mb(megabytes),gb(gigabytes),tb(terrabytes)
 * ex:
-	* size <= 234mb:		if file less than or equal to 234 megabytes
-	* size > gb:			if file greater than 4 gigabytes
+	* size <= 234mb:
+		* if file less than or equal to 234 megabytes
+	* size > gb:
+		* if file greater than 4 gigabytes
