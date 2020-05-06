@@ -19,22 +19,22 @@ class OpBuild:
         for x in TokenType:
 
             # path statement
-            if (x[0] == "path") and (state == 0):
+            if ((x[0] == "path") or (x[0] == "clear")) and (state == 0):
                 state = 1
                 opbuilder[0] = 0
-                opbuilder[1] = x[1]
+                opbuilder[1] = x
 
             # if filename(.modname)(!)=string
             # name
             elif (x[0] == "filename") and (state == 0):
                 state = 2
-                opbuilder[1] = x[1]
+                opbuilder[1] = x
             # name(.)
             elif (x[0] == "dot") and (state == 2):
                 state = 3
             # name(.modname)
             elif (x[0] == "modname") and (state == 3):
-                opbuilder[1] = x[2]
+                opbuilder[2] = x
                 state = 4
             # name(.modname)(!)
             elif (x[0] == "inv") and (state == 4):
@@ -56,7 +56,7 @@ class OpBuild:
             # filesize
             elif (x[0] == "filesize") and (state == 0):
                 state = 8
-                opbuilder[3] = x
+                opbuilder[1] = x
             # filesize (!)
             elif (x[0] == "inv") and (state == 8):
                 opbuilder[0] = 6
@@ -119,6 +119,7 @@ class OpBuild:
                 opbuilder = [0, '', '', '', '']
             elif x[0] == "endline" and state == 0:
                 opbuilder[1] = x
+                opbuilder[0] = 1
                 opList.append(opbuilder)
                 opbuilder = [0, '', '', '', '']
                 state = 0

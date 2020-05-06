@@ -41,7 +41,7 @@ class LexicalAnalyzer:
 
     def parseTokens(self, strin):
         strin = strin.lower()  # were not doing case sensitivity
-        Tokens = re.split(r'(?:(\".+?\")|(\'.+?\')|(\B\\.+\\(\B|\b))|(\B\/.+\/(\B|\b))|(\<\=)|(\>\=)|(\b\w+\b)|([\.\+\-\<\>\=\:\!\n\t]))', strin) # defines what tokens can look like and split accordingly
+        Tokens = re.split(r'(?:(\".+?\")|(\'.+?\')|(\B\\.+\\(\B|\b))|(\B\/.+\/(\B|\b))|(\<\=)|(\>\=)|(\b\w+\b)|([\.\<\>\=\:\!\n\t]))', strin) # defines what tokens can look like and split accordingly
         Tokens = list(filter(None, Tokens))  # re.split used in on big regex like this causes a empty variables to to be added, this filters them out
         self._IdentifyTokens(Tokens)  # call identify tokens process, pass the token list
 
@@ -54,8 +54,6 @@ class LexicalAnalyzer:
                 TokenTypes.append(("endline","\\n"))
             elif re.match(r'^(\<\=)|(\>\=)|([\<\>\=])$', x):  # expression operators
                 TokenTypes.append(("equivalence", x))
-            elif re.match(r'^[\+\-]$',x):  # math operators # not used in current build
-                TokenTypes.append(("operator", x))
             elif re.match(r'(\B\\.+\\(\B|\b))|(\B\/.+\/(\B|\b))', x):  # destination subdirectory
                 TokenTypes.append(("path", x))
             elif re.match(r'(\".+?\")|(\'.+?\')', x):  # string

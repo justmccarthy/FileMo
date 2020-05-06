@@ -14,13 +14,13 @@ class sorter:
 
     def stackif(self, file, ops):
         boolstack = True
-        state = False
-        for x in ops:
-            if x[1] == 'filename':
+        state = True
+        for x in ops:  # if there is no ops returns true
+            if x[1][1] == 'filename':
                 #name = os.path.basename(file)
                 name = os.path.splitext(file)
                 reg = x[3][1][1:-1]  # strip quotes
-                if x[0] == 'type':
+                if x[1][0] == 'type':
                     if x[2][0] == 'contains':
                         if reg == '':
                             state = True
@@ -34,7 +34,7 @@ class sorter:
                             #state = re.match(r'.*\.%s$' % reg, name)
                         state = (reg == name[1])
 
-                elif x[0] == 'name':
+                elif x[1][0] == 'name':
                     if x[2][0] == 'contains':
                         if reg == '':
                             state = True
@@ -47,10 +47,11 @@ class sorter:
 
                 if x[0] == 6:
                     state = not state
-            if x[1] == 'medianame':
+            elif x[1] == 'medianame':
                 reg = x[3][1][1:-1]  # strip quotes
 
-
+            else:
+                state = False  # if op is unrecognized returns false
 
         return boolstack and state
 
@@ -58,9 +59,7 @@ class sorter:
         opstack = []
         for x in self.opfeed:
             if x[0] == 0:
-                if opstack[i][1] == 'endline':  #
-                    opstack.append(x)
-                elif opstack[i][1] == 'clear':  # clear if stack
+                if opstack[i][1] == 'clear':  # clear if stack
                     i = len(opstack) - 1
                     while i >= 0:
                         opstack.pop(i)
@@ -76,7 +75,7 @@ class sorter:
                             except:
                                 pass
                     i = len(opstack) - 1
-                    while (i >= 0 and opstack[i][1] == 'endline'):
+                    while (i >= 0 and opstack[i][1][0] == 'endline'):
                         opstack.pop(i)
             else:
                 opstack.append(x)
