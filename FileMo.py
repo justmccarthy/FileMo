@@ -292,11 +292,14 @@ class CodePage(tk.Frame):
     def runScript(self):
         self.controller.script = str(self.code.get(1.0, 'end'))
         if self.controller.script.isspace():
-            print("No code has been writen") # Added popup error message for this
+            print("No code has been writen")
+            tk.messagebox.showwarning(title="Code Error", message="No code has been writen")
         elif self.controller.destFile == '':
-            print("A destination has not been set") # Added popup error message for this
+            print("A destination has not been set")
+            tk.messagebox.showwarning(title="Destination Error", message="A destination has not been set")
         elif len(self.controller.files) == 0:
-            print("Select some files to be sorted")  # Added popup error message for this
+            print("Select some files to be sorted")
+            tk.messagebox.showwarning(title="File Selection Error", message="Select some files to be sorted")
         else:
             Process = Interpreter.LexicalAnalyzer(self.controller.destFile, self.controller.files)
             Script = self.code.get(0.0, tk.END)  # get all text in box
