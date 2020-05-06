@@ -74,18 +74,11 @@ class OpBuild:
 
             # if filetime(.modtime) (!)= time
             # filetime
-            elif (x[0] == "filetime" or x[0] == "metatime") and (state == 3):
+            elif x[0] == "filetime" and (state == 3):
                 state = 12
                 opbuilder.append(x)
-            # filetime(.)
-            elif (x[0] == "dot") and (state == 12):
-                state = 13
-            # filetime(.modname)
-            elif (x[0] == "modtime") and (state == 13):
-                opbuilder[2] = x
-                state = 14
             # filetime(.modname)(!)
-            elif (x[0] == "inv") and (state == 14):
+            elif (x[0] == "inv") and (state == 12):
                 opbuilder[0] = 6
                 state = 15
             # filetime(.modname)(!)=
@@ -96,7 +89,7 @@ class OpBuild:
                 opbuilder[0] = self.GetEquiv(x[1], mod)
                 state = 16
             # filetime(.modname)(!)= date
-            elif (x[0] == "date") and (state == 16):
+            elif (x[0] == "time" or x[0] == "date") and (state == 16):
                 state = 17
                 opbuilder[3] = x
 

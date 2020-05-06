@@ -1,4 +1,5 @@
-import os, eyed3 #shutil, re  #gonna use pyinstaller to compile now, use anything you want
+import os, time, re, eyed3  # pip install eyed3
+from datetime import datetime, timedelta
 
 class sorter:
     ifstack = []
@@ -36,13 +37,11 @@ class sorter:
             elif x[1][0] == 'medianame':
                 reg = x[3][1][1:-1]  # strip quotes
                 if x[1][1] == "title":
-                    tag = eyed3.Tag()
-                    tag.link(file)
-                    name = tag.getTitle()
+                    mp3 = eyed3.load(file)
+                    name = mp3.tag.getTitle()
                 elif x[1][1] == "artist":
-                    tag = eyed3.Tag()
-                    tag.link(file)
-                    name = tag.getArtist()
+                    mp3 = eyed3.load(file)
+                    name = mp3.tag.getArtist()
                 elif x[1][1] == "author":
                     name = os.stat(file).st_uid
                 if x[2][0] == 'contains':
@@ -56,7 +55,95 @@ class sorter:
                     state = not state
 
             elif x[1][0] == 'fileTime':
-                usertime = x[3]
+                if x[3][0] == 'time':
+                    try:
+                        # extract int from user date
+                        usertime = int(re.search(r'\d+', x[3]).group())
+                        if 's' in x[3][1]:
+                            usertime = timedelta(seconds=usertime)
+                        elif 'mn' in x[3][1]:
+                            usertime = timedelta(minutes=usertime)
+                        elif 'h' in x[3][1]:
+                            usertime = timedelta(hours=usertime)
+                        elif 'd' in x[3][1]:
+                            usertime = timedelta(days=usertime)
+                        elif 'm' in x[3][1]:
+                            usertime = timedelta(days=usertime*30.44)  # timedelta does not use months
+                        elif 'y' in x[3][1]:
+                            usertime = timedelta(days=usertime*365.25)  # timedelta does not use years
+                        # get files time
+                        if x[1][1] == 'modifydate':
+                            filetime = datetime.fromtimestamp(os.path.getmtime(file))
+                        elif x[1][1] == 'createdate':
+                            filetime = datetime.fromtimestamp(os.path.getctime(file))
+                        elif x[1][1] == 'accessdate':
+                            filetime = datetime.fromtimestamp(os.path.getatime(file))
+                        # do compare
+                        if x[0] == 1:
+                            state = filetime.date() == (datetime.today() - usertime).date()
+                        elif x[0] == 2:
+                            state = filetime >= datetime.today() - usertime
+                        elif x[0] == 3:
+                            state = filetime < datetime.today() - usertime
+                        elif x[0] == 4:
+                            state = filetime <= datetime.today() - usertime
+                        elif x[0] == 5:
+                            state = filetime > datetime.today() - usertime
+                        elif x[0] == 6:
+                            state = filetime.date() != (datetime.today() - usertime).date()
+                    except:
+                        print('invalid date')
+                        state = False
+                elif x[3][0] == 'date':
+                    try:
+                        usertime = datetime.strptime(x[3][1], '%d-%m-%Y')
+                        if x[1][1] == 'modifydate':
+                            filetime = datetime.fromtimestamp(os.path.getmtime(file))
+                        elif x[1][1] == 'createdate':
+                            filetime = datetime.fromtimestamp(os.path.getctime(file))
+                        elif x[1][1] == 'accessdate':
+                            filetime = datetime.fromtimestamp(os.path.getatime(file))
+                        # do compare
+                        if x[0] == 1:
+                            state = filetime.date() == usertime.date()
+                        elif x[0] == 2:
+                            state = filetime.date() >= usertime.date()
+                        elif x[0] == 3:
+                            state = filetime.date() < usertime.date()
+                        elif x[0] == 4:
+                            state = filetime.date() <= usertime.date()
+                        elif x[0] == 5:
+                            state = filetime.date() > usertime.date()
+                        elif x[0] == 6:
+                            state = filetime.date() != usertime.date()
+                    except:
+                        print('invalid date')
+                        state = False
+
+            elif x[1][0] == 'filesize':
+                filesize = os.path.getsize(file)
+                usersize = int(re.search(r'\d+', x[3]).group())
+                mult = 1
+                if 'kb' in x[3][1]:
+                    mult = 1024
+                elif 'mb' in x[3][1]:
+                    mult = 1048576
+                elif 'gb' in x[3][1]:
+                    mult = 1073741824
+                elif 'tb' in x[3][1]:
+                    mult = 1099511627776
+                if x[0] == 1:
+                    state = filesize == usersize * mult
+                elif x[0] == 2:
+                    state = filesize >= usersize * mult
+                elif x[0] == 3:
+                    state = filesize < usersize * mult
+                elif x[0] == 4:
+                    state = filesize <= usersize * mult
+                elif x[0] == 5:
+                    state = filesize > usersize * mult
+                elif x[0] == 6:
+                    state = filesize != usersize * mult
             else:
                 state = False  # if op is unrecognized returns false
 
