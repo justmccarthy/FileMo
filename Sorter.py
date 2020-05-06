@@ -153,7 +153,10 @@ class sorter:
                     state = filesize > usersize * mult
                 elif x[0] == 6:
                     state = filesize != usersize * mult
-        return boolstack and state
+
+            boolstack = boolstack and state
+
+        return boolstack
 
     def sortif(self):
         opstack = []
@@ -174,8 +177,9 @@ class sorter:
                                 os.rename(y, (self.dest + x[1][1] + os.path.basename(y)))
                             except:
                                 pass
-                    i = len(opstack)
-                    while opstack[-1][1][0] == 'endline':
-                        opstack.pop()
+                    #i = len(opstack)
+                    #while opstack[-1][1][0] == 'endline':
+                        #opstack.pop()
+                    opstack.pop()
             else:
                 opstack.append(x)

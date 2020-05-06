@@ -19,9 +19,12 @@ class OpBuild:
 
             # path statement
             if ((x[0] == "path") or (x[0] == "clear")) and (state == 0):
-                state = 1
+                #state = 1
+                state = 0
                 opbuilder[0] = 0
                 opbuilder[1] = x
+                opList.append(opbuilder)
+                opbuilder = [0, '', '', '']
 
             # if filename(.modname)(!)=string
             # name
@@ -69,7 +72,7 @@ class OpBuild:
                 state = 10
             # filesize (!)= size
             elif (x[0] == "size") and (state == 10):
-                state = 11
+                state = 7
                 opbuilder[3] = x
 
             # if filetime(.modtime) (!)= time
@@ -90,11 +93,11 @@ class OpBuild:
                 state = 16
             # filetime(.modname)(!)= date
             elif (x[0] == "time" or x[0] == "date") and (state == 16):
-                state = 17
+                state = 7
                 opbuilder[3] = x
 
-            # end if
-            elif (x[0] == "endif") and ((state == 7) or (state == 11) or (state == 17)):
+            # :end if
+            elif (x[0] == "endif") and ((state == 7)):
                 opList.append(opbuilder)
                 opbuilder = [0, '', '', '']
                 state = 0
@@ -102,14 +105,14 @@ class OpBuild:
             # end line after path and clear
             elif (x[0] == "endline") and ((state == 1)):
                 state = 0
-                opList.append(opbuilder)
-                opbuilder = [0, '', '', '']
+                #opList.append(opbuilder)
+                #opbuilder = [0, '', '', '']
             # end line after if(s)
             elif x[0] == "endline" and state == 0:
-                opbuilder[1] = x
-                opbuilder[0] = 1
-                opList.append(opbuilder)
-                opbuilder = [0, '', '', '']
+                # opbuilder[1] = x
+                # opbuilder[0] = 1
+                # opList.append(opbuilder)
+                # opbuilder = [0, '', '', '']
                 state = 0
 
             else:
