@@ -107,25 +107,29 @@ class sorter:
                 elif x[3][0] == 'date':
                     try:
                         usertime = datetime.strptime(x[3][1], '%d-%m-%Y')
-                        if x[1][1] == 'modifydate':
-                            filetime = datetime.fromtimestamp(os.path.getmtime(file))
-                        elif x[1][1] == 'createdate':
-                            filetime = datetime.fromtimestamp(os.path.getctime(file))
-                        elif x[1][1] == 'accessdate':
-                            filetime = datetime.fromtimestamp(os.path.getatime(file))
-                        # do compare
-                        if x[0] == 1:
-                            state = filetime.date() == usertime.date()
-                        elif x[0] == 2:
-                            state = filetime.date() >= usertime.date()
-                        elif x[0] == 3:
-                            state = filetime.date() < usertime.date()
-                        elif x[0] == 4:
-                            state = filetime.date() <= usertime.date()
-                        elif x[0] == 5:
-                            state = filetime.date() > usertime.date()
-                        elif x[0] == 6:
-                            state = filetime.date() != usertime.date()
+                        try:
+                            if x[1][1] == 'modifydate':
+                                filetime = datetime.fromtimestamp(os.path.getmtime(file))
+                            elif x[1][1] == 'createdate':
+                                filetime = datetime.fromtimestamp(os.path.getctime(file))
+                            elif x[1][1] == 'accessdate':
+                                filetime = datetime.fromtimestamp(os.path.getatime(file))
+                            # do compare
+                            if x[0] == 1:
+                                state = filetime.date() == usertime.date()
+                            elif x[0] == 2:
+                                state = filetime.date() >= usertime.date()
+                            elif x[0] == 3:
+                                state = filetime.date() < usertime.date()
+                            elif x[0] == 4:
+                                state = filetime.date() <= usertime.date()
+                            elif x[0] == 5:
+                                state = filetime.date() > usertime.date()
+                            elif x[0] == 6:
+                                state = filetime.date() != usertime.date()
+                        except:
+                            #file has already been sorted
+                            state = False
                     except:
                         print('invalid date')
                         state = False

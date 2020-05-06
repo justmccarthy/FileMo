@@ -1,0 +1,7 @@
+modifydate = 06-05-2020:
+	/may6/
+modifydate < 06-05-2020:
+	/early/
+
+
+
