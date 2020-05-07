@@ -23,7 +23,8 @@ class LexicalAnalyzer:
         # simple items
         ('!', 'inv'),
         ('.', 'dot'),
-        (':', 'endif')
+        (':', 'endif'),
+        ('/', 'path')
     ]
 
     def __init__(self,DestIn, SortFilesIn):
