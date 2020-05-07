@@ -246,6 +246,11 @@ class CodePage(tk.Frame):
         right_frame.grid_columnconfigure(1, weight=2)
         right_frame.grid_columnconfigure(2, weight=2)
 
+        # Add cheat sheet text
+        with open("FileLingoCheatSheet.txt", "r") as f:
+            cheat_sheet.insert(tk.END, f.read())
+        cheat_sheet.configure(state="disabled")
+
 
     # Set destination directoy
     def getDestDir(self):

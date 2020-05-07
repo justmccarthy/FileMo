@@ -1,0 +1,86 @@
+************ FileLingo ************
+
+  **** CONDITION STATEMENTS ****
+
+-Conditional statement structure:
+   keyword operator value:
+	filepath
+
+-Comparable keywords including:
+   name, type, modifydate, 
+   createdate, accessdate,
+   date, time, size
+
+-End with a colon character ':'
+   Ex:
+     name = "hello world":
+
+-Filepath refers to the parent 
+ folder your files will be sorted
+ into. format:
+	/parentFile/
+	/exFile/dest/
+
+-Available operators:
+    = - exactly equal
+   != - not equal
+    < - less than
+    > - greater than
+   <= - less than or equal to
+   >= - greater than or equal to
+
+
+************ EXAMPLES *************
+
+   ***** filename Filters *****
+
+* name-> name of file
+	name = "myFile":
+
+* type-> file extension name
+	type != "mp4":
+
+
+
+     ***** Date Filters *****
+
+-Date format -> 
+	  dd-mm-dddd
+   - single-digit dates require a 
+     leading 0
+
+-Time since ->
+   - append following keywork to
+	end of an integer:
+	  s - seconds
+	  mn - minutes
+	  h - hours
+	  d - days
+	  m - months
+	  y - years
+
+
+* modifydate-> date last modified
+	modifydate > 01-19-2005:
+
+* createdate-> date created
+	createdate != 35mn:
+
+* accessdate-> date last accessed
+	accessdate > 2y:
+
+
+
+     ***** Size Filters *****
+
+-Size keywords ->
+   - append following keywork to
+	end of an integer:
+	  b - bytes
+	  kb - kilobytes
+	  mb - megabutes
+	  gb - gigabytes
+	  tb - terabytes
+
+* size-> file size
+	size <= 234mb:
