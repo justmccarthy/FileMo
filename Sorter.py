@@ -214,8 +214,6 @@ class sorter:
                                 new_name = new_name.replace('(aday)', str(fileA.day))
                                 
                                 #################################################################
-                                print ("done")
-                                print("test " + new_name)
                                 Path(self.dest + new_name).mkdir(parents=True, exist_ok=True)  # make directory
                             except:
                                 pass
