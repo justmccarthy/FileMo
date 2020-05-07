@@ -1,0 +1,9 @@
+name = 'run':
+	/run/
+modifydate = 06-05-2020:
+	/may6/
+size < 1mb:
+	/small/
+/big/
+
+

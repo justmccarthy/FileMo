@@ -6,6 +6,7 @@ class sorter:
     ifstack = []  # stores
     opfeed = []  # oplist storage
     files = []  # file list storage
+    sortedFiles = [] # list of already sorted files
     dest = ''  # dest directory storage
 
     def __init__(self, oplist, dest, filelist):
@@ -20,43 +21,50 @@ class sorter:
         for x in ops:  # if there is no ops returns true
             if x[1][0] == 'filename':
                 reg = x[3][1][1:-1]  # strip quotes
-                name = os.path.splitext(os.path.basename(file))
-                if x[1][1] == 'type':
-                    name = name[1][1:]
-                elif x[1][1] == 'name':
-                    name = name[0]
-                if x[2] != '':
-                    if reg == '':
-                        state = True
-                    else:
-                        state = (reg in name)
-                else:
-                    state = (reg == name.lower())
-                if x[0] == 6:
-                    state = not state
-
-
-            elif x[1][0] == 'medianame':
                 try:
-                    reg = x[3][1][1:-1]  # strip quotes
-                    name = ''
-                    if x[1][1] == "title":
-                        mp3 = eyed3.load(file)
-                        name = mp3.tag.getTitle().lower()
-                    elif x[1][1] == "artist":
-                        mp3 = eyed3.load(file)
-                        name = mp3.tag.getArtist().lower()
-                    elif x[1][1] == "author":
-                        name = os.stat(file).st_uid.lower()
+                    name = os.path.splitext(os.path.basename(file))
+                    if x[1][1] == 'type':
+                        name = name[1][1:]
+                    elif x[1][1] == 'name':
+                        name = name[0]
                     if x[2] != '':
                         if reg == '':
                             state = True
                         else:
                             state = (reg in name)
                     else:
-                        state = (reg == name)
+                        state = (reg == name.lower())
                     if x[0] == 6:
                         state = not state
+                except:
+                    #file already sorted
+                    state = False
+
+
+            elif x[1][0] == 'medianame':
+                try:
+                    if not (file in self.sortedFiles): # if file not sorted
+                        reg = x[3][1][1:-1]  # strip quotes
+                        name = ''
+                        if x[1][1] == "title":
+                            mp3 = eyed3.load(file)
+                            name = mp3.tag.getTitle().lower()
+                        elif x[1][1] == "artist":
+                            mp3 = eyed3.load(file)
+                            name = mp3.tag.getArtist().lower()
+                        elif x[1][1] == "author":
+                            name = os.stat(file).st_uid.lower()
+                        if x[2] != '':
+                            if reg == '':
+                                state = True
+                            else:
+                                state = (reg in name)
+                        else:
+                            state = (reg == name)
+                        if x[0] == 6:
+                            state = not state
+                    else:
+                        state = False #file is already sorted
                 except:
                     state = False
 
@@ -78,28 +86,32 @@ class sorter:
                         elif 'y' in x[3][1]:
                             usertime = timedelta(days=usertime*365.25)  # timedelta does not use years
                         # get files time
-                        if x[1][1] == 'modifydate':
-                            filetime = datetime.fromtimestamp(os.path.getmtime(file))
-                        elif x[1][1] == 'createdate':
-                            filetime = datetime.fromtimestamp(os.path.getctime(file))
-                        elif x[1][1] == 'accessdate':
-                            filetime = datetime.fromtimestamp(os.path.getatime(file))
-                        else:
-                            x[0] = 0
-                        # do compare
-                        if x[0] == 1:
-                            state = filetime.date() == (datetime.today() - usertime).date()
-                        elif x[0] == 2:
-                            state = filetime >= datetime.today() - usertime
-                        elif x[0] == 3:
-                            state = filetime < datetime.today() - usertime
-                        elif x[0] == 4:
-                            state = filetime <= datetime.today() - usertime
-                        elif x[0] == 5:
-                            state = filetime > datetime.today() - usertime
-                        elif x[0] == 6:
-                            state = filetime.date() != (datetime.today() - usertime).date()
-                        else:
+                        try:
+                            if x[1][1] == 'modifydate':
+                                filetime = datetime.fromtimestamp(os.path.getmtime(file))
+                            elif x[1][1] == 'createdate':
+                                filetime = datetime.fromtimestamp(os.path.getctime(file))
+                            elif x[1][1] == 'accessdate':
+                                filetime = datetime.fromtimestamp(os.path.getatime(file))
+                            else:
+                                x[0] = 0
+                            # do compare
+                            if x[0] == 1:
+                                state = filetime.date() == (datetime.today() - usertime).date()
+                            elif x[0] == 2:
+                                state = filetime >= datetime.today() - usertime
+                            elif x[0] == 3:
+                                state = filetime < datetime.today() - usertime
+                            elif x[0] == 4:
+                                state = filetime <= datetime.today() - usertime
+                            elif x[0] == 5:
+                                state = filetime > datetime.today() - usertime
+                            elif x[0] == 6:
+                                state = filetime.date() != (datetime.today() - usertime).date()
+                            else:
+                                state = False
+                        except:
+                            #file already sorted
                             state = False
                     except:
                         print('invalid date')
@@ -135,29 +147,33 @@ class sorter:
                         state = False
 
             elif x[1][0] == 'filesize':
-                filesize = os.path.getsize(file)
-                usersize = int(re.search(r'\d+', x[3][1]).group())
-                mult = 1
-                if 'kb' in x[3][1]:
-                    mult = 1024
-                elif 'mb' in x[3][1]:
-                    mult = 1048576
-                elif 'gb' in x[3][1]:
-                    mult = 1073741824
-                elif 'tb' in x[3][1]:
-                    mult = 1099511627776
-                if x[0] == 1:
-                    state = filesize == usersize * mult
-                elif x[0] == 2:
-                    state = filesize >= usersize * mult
-                elif x[0] == 3:
-                    state = filesize < usersize * mult
-                elif x[0] == 4:
-                    state = filesize <= usersize * mult
-                elif x[0] == 5:
-                    state = filesize > usersize * mult
-                elif x[0] == 6:
-                    state = filesize != usersize * mult
+                try:
+                    filesize = os.path.getsize(file)
+                    usersize = int(re.search(r'\d+', x[3][1]).group())
+                    mult = 1
+                    if 'kb' in x[3][1]:
+                        mult = 1024
+                    elif 'mb' in x[3][1]:
+                        mult = 1048576
+                    elif 'gb' in x[3][1]:
+                        mult = 1073741824
+                    elif 'tb' in x[3][1]:
+                        mult = 1099511627776
+                    if x[0] == 1:
+                        state = filesize == usersize * mult
+                    elif x[0] == 2:
+                        state = filesize >= usersize * mult
+                    elif x[0] == 3:
+                        state = filesize < usersize * mult
+                    elif x[0] == 4:
+                        state = filesize <= usersize * mult
+                    elif x[0] == 5:
+                        state = filesize > usersize * mult
+                    elif x[0] == 6:
+                        state = filesize != usersize * mult
+                except:
+                    # file already sorted
+                    state = False
 
             boolstack = boolstack and state
 
@@ -179,7 +195,9 @@ class sorter:
                             except:
                                 pass
                             try:
-                                os.rename(y, (self.dest + x[1][1] + os.path.basename(y)))
+                                if not (y in self.sortedFiles):
+                                    os.rename(y, (self.dest + x[1][1] + os.path.basename(y)))
+                                    self.sortedFiles.append(y)
                             except:
                                 pass
                     if len(opstack) != 0:
