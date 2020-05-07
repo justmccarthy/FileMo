@@ -204,3 +204,5 @@ class sorter:
                         opstack.pop()
             else:
                 opstack.append(x)
+
+        self.sortedFiles.clear()
