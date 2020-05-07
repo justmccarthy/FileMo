@@ -160,7 +160,8 @@ class sorter:
                     elif 'tb' in x[3][1]:
                         mult = 1099511627776
                     if x[0] == 1:
-                        state = filesize == usersize * mult
+                        filesize = filesize // mult
+                        state = filesize == usersize
                     elif x[0] == 2:
                         state = filesize >= usersize * mult
                     elif x[0] == 3:
@@ -170,7 +171,8 @@ class sorter:
                     elif x[0] == 5:
                         state = filesize > usersize * mult
                     elif x[0] == 6:
-                        state = filesize != usersize * mult
+                        filesize = filesize // mult
+                        state = filesize != usersize
                 except:
                     # file already sorted
                     state = False
