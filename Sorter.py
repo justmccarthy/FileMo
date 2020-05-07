@@ -193,12 +193,35 @@ class sorter:
                     for y in self.files:
                         if self.stackif(y, opstack):  # do if stack on file
                             try:
-                                Path(self.dest + x[1][1]).mkdir(parents=True, exist_ok=True)  # make directory
+                                ################################################################
+                                
+                                new_name = x[1][1]
+                                
+                                fileC = datetime.fromtimestamp(os.path.getctime(y))
+                                fileM = datetime.fromtimestamp(os.path.getmtime(y))
+                                fileA = datetime.fromtimestamp(os.path.getatime(y))
+                                
+                                new_name = new_name.replace('(cyear)', str(fileC.year))
+                                new_name = new_name.replace('(myear)', str(fileM.year))
+                                new_name = new_name.replace('(ayear)', str(fileA.year))
+
+                                new_name = new_name.replace('(cmonth)', str(fileC.month))
+                                new_name = new_name.replace('(mmonth)', str(fileM.month))
+                                new_name = new_name.replace('(amonth)', str(fileA.month))
+
+                                new_name = new_name.replace('(cday)', str(fileC.day))
+                                new_name = new_name.replace('(mday)', str(fileM.day))
+                                new_name = new_name.replace('(aday)', str(fileA.day))
+                                
+                                #################################################################
+                                print ("done")
+                                print("test " + new_name)
+                                Path(self.dest + new_name).mkdir(parents=True, exist_ok=True)  # make directory
                             except:
                                 pass
                             try:
                                 if not (y in self.sortedFiles):
-                                    os.rename(y, (self.dest + x[1][1] + os.path.basename(y)))
+                                    os.rename(y, (self.dest + new_name + os.path.basename(y)))
                                     self.sortedFiles.append(y)
                             except:
                                 pass
