@@ -21,7 +21,7 @@ CS441 group project
 		* string: "user input" or 'user input'
 * ex:
 	* name = "hello world":			
-		* if file name is hellow world
+		* if file name is hello world
 	* type != 'mp4':
 		* if file type is not mp4
 	* name.contains != 'file': 
@@ -46,9 +46,9 @@ CS441 group project
 
 * size (!=,=,<,<=,>,>=) usersize
 	* size
-	* usersize: integer followed by b(bytes),kb(kilobytes),mb(megabytes),gb(gigabytes),tb(terrabytes)
+	* usersize: integer followed by b(bytes),kb(kilobytes),mb(megabytes),gb(gigabytes),tb(terabytes)
 * ex:
 	* size <= 234mb:
 		* if file less than or equal to 234 megabytes
-	* size > gb:
+	* size > 4gb:
 		* if file greater than 4 gigabytes
