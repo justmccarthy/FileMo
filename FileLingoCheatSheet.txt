@@ -20,6 +20,12 @@
  into. format:
 	/parentFile/
 	/exFile/dest/
+	/(cyear)/
+#(cyear) will create a foldername
+based on the files creation year.
+Also works on month and day
+with c(creation), m(modify),
+and a(access) prefixes
 
 -Available operators:
     = - exactly equal

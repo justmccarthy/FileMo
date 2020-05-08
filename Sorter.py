@@ -201,17 +201,20 @@ class sorter:
                                 fileM = datetime.fromtimestamp(os.path.getmtime(y))
                                 fileA = datetime.fromtimestamp(os.path.getatime(y))
                                 
-                                new_name = new_name.replace('(cyear)', str(fileC.year))
-                                new_name = new_name.replace('(myear)', str(fileM.year))
-                                new_name = new_name.replace('(ayear)', str(fileA.year))
+                                new_name = new_name.replace('(cyear)', str(fileC.year) + ' c')
+                                new_name = new_name.replace('(myear)', str(fileM.year) + ' m')
+                                new_name = new_name.replace('(ayear)', str(fileA.year) + ' a')
 
-                                new_name = new_name.replace('(cmonth)', str(fileC.month))
-                                new_name = new_name.replace('(mmonth)', str(fileM.month))
-                                new_name = new_name.replace('(amonth)', str(fileA.month))
+                                new_name = new_name.replace('(cmonth)', str(fileC.month) + ' c')
+                                new_name = new_name.replace('(mmonth)', str(fileM.month) + ' m')
+                                new_name = new_name.replace('(amonth)', str(fileA.month) + ' a')
 
-                                new_name = new_name.replace('(cday)', str(fileC.day))
-                                new_name = new_name.replace('(mday)', str(fileM.day))
-                                new_name = new_name.replace('(aday)', str(fileA.day))
+                                new_name = new_name.replace('(cday)', str(fileC.day) + ' c')
+                                new_name = new_name.replace('(mday)', str(fileM.day) + ' m')
+                                new_name = new_name.replace('(aday)', str(fileA.day) + ' a')
+
+                                #for x in ['<', '>', ':', '"', '/', '\\', '|', '?', '*']:
+                                #    print(x)
                                 
                                 #################################################################
                                 Path(self.dest + new_name).mkdir(parents=True, exist_ok=True)  # make directory
