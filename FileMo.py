@@ -309,6 +309,7 @@ class CodePage(tk.Frame):
             Process = Interpreter.LexicalAnalyzer(self.controller.destFile, self.controller.files)
             Script = self.code.get(0.0, tk.END)  # get all text in box
             if Process.parseTokens(Script):
+                messagebox.showinfo("Success", "Files have been sorted successfully!")
                 self.controller.show_frame("StartPage")
                 clr = self.controller.get_page("StartPage")
                 clr.clearFiles()
@@ -323,6 +324,10 @@ class CodePage(tk.Frame):
             else:
                 run_errors = Process.getErrors()
                 print(run_errors)
+                error_msg = ""
+                for err in run_errors["interpreter"]:
+                    error_msg += err + '\n'
+                messagebox.showerror("Compiler Errors", error_msg)
                 Process.clearErrors()
             
 
