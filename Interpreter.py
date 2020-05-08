@@ -38,9 +38,9 @@ class LexicalAnalyzer:
         strin = strin.lower()  # were not doing case sensitivity
         Tokens = re.split(r'(?:(\".+?\")|(\'.+?\')|(\B\\.+\\(\B|\b))|(\B\/.+\/(\B|\b))|(\d\d\-\d\d\-\d\d\d\d)|(\<\=)|(\>\=)|(\b\w+\b)|([\.\<\>\=\:\!\n\t]))', strin) # defines what tokens can look like and split accordingly
         Tokens = list(filter(None, Tokens))  # re.split used in on big regex like this causes a empty variables to to be added, this filters them out
-        return self._IdentifyTokens(Tokens)  # call identify tokens process, pass the token list
+        return self.IdentifyTokens(Tokens)  # call identify tokens process, pass the token list
 
-    def _IdentifyTokens(self, Tokens):  # need to work on names for token typings
+    def IdentifyTokens(self, Tokens):  # need to work on names for token typings
         TokenTypes = []
         for x in Tokens:
             if x == ' ' or x == '\0' or x == '\t':  # filter missed spaces, end_string, and tabs out
