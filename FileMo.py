@@ -78,7 +78,7 @@ class StartPage(tk.Frame):
         label.grid(row=0, column=1, sticky = "s")
 
         # Add multiselected delete: add back (selectmode="multiple",)
-        self.selected_list = tk.Listbox(f3, bg='#ffffff', width = 40, height = 30)
+        self.selected_list = tk.Listbox(f3, bg='#ffffff', width = 50, height = 30)
         self.selected_list.grid(row = 0, column = 0, sticky= "nsew")
 
         file_button = tk.Button(f1, text="Select File(s)",
@@ -308,18 +308,22 @@ class CodePage(tk.Frame):
         else:
             Process = Interpreter.LexicalAnalyzer(self.controller.destFile, self.controller.files)
             Script = self.code.get(0.0, tk.END)  # get all text in box
-            Process.parseTokens(Script)
-            self.controller.show_frame("StartPage")
-            clr = self.controller.get_page("StartPage")
-            clr.clearFiles()
-            if (self.saveCode.get() == False):
-                self.code.delete(1.0, "end")
-            if (self.saveDes.get() == False):
-                self.controller.destFile = ""
-                self.dest_entry.configure(state="normal")
-                self.dest_entry.delete(0, 'end')
-                self.dest_entry.insert(0, self.controller.destFile)
-                self.dest_entry.configure(state="readonly")
+            if Process.parseTokens(Script):
+                self.controller.show_frame("StartPage")
+                clr = self.controller.get_page("StartPage")
+                clr.clearFiles()
+                if (self.saveCode.get() == False):
+                    self.code.delete(1.0, "end")
+                if (self.saveDes.get() == False):
+                    self.controller.destFile = ""
+                    self.dest_entry.configure(state="normal")
+                    self.dest_entry.delete(0, 'end')
+                    self.dest_entry.insert(0, self.controller.destFile)
+                    self.dest_entry.configure(state="readonly")
+            else:
+                run_errors = Process.getErrors()
+                print(run_errors)
+                Process.clearErrors()
             
 
 

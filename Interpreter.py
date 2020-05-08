@@ -1,7 +1,10 @@
 import re, OpBuilder
+from collections import defaultdict
 
 
 class LexicalAnalyzer:
+    errors = defaultdict(list)
+
     # reserved list
     Reserved = [  # if reserved[0] then token is of type reserved[1]
         # file name related
@@ -35,7 +38,7 @@ class LexicalAnalyzer:
         strin = strin.lower()  # were not doing case sensitivity
         Tokens = re.split(r'(?:(\".+?\")|(\'.+?\')|(\B\\.+\\(\B|\b))|(\B\/.+\/(\B|\b))|(\d\d\-\d\d\-\d\d\d\d)|(\<\=)|(\>\=)|(\b\w+\b)|([\.\<\>\=\:\!\n\t]))', strin) # defines what tokens can look like and split accordingly
         Tokens = list(filter(None, Tokens))  # re.split used in on big regex like this causes a empty variables to to be added, this filters them out
-        self._IdentifyTokens(Tokens)  # call identify tokens process, pass the token list
+        return self._IdentifyTokens(Tokens)  # call identify tokens process, pass the token list
 
     def _IdentifyTokens(self, Tokens):  # need to work on names for token typings
         TokenTypes = []
@@ -66,7 +69,19 @@ class LexicalAnalyzer:
                         break
                 if not identified:
                     #TokenTypes.append(("shortstring", x))
-                    print('error, cant identify:' + x)
+                    error_msg = f"Invalid token: {x}"
+                    print(error_msg)
+                    self.errors["interpreter"].append(error_msg)
 
-        self.builder.BuildOps(TokenTypes)
+        if not self.errors["interpreter"]:
+            self.builder.BuildOps(TokenTypes) # Return true if not errors in BuildOps
+            return True
+        else:
+            return False
+
+    def getErrors(self):
+        return self.errors
+
+    def clearErrors(self):
+        self.errors.clear()
 
