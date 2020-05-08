@@ -116,9 +116,11 @@ class OpBuild:
                 state = 0
 
             else:
-                print("error: bad syntax at:", x)
+                op_error = f"Invalid operation: {x[1]}"
+                print(op_error)
                 # print(state)
-                return
+                return op_error
+
         Sorter.sorter(opList, self.Dest, self.SortFiles)
 
     def GetEquiv(self, symbol, mod = False):

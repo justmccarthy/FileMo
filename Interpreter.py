@@ -74,8 +74,13 @@ class LexicalAnalyzer:
                     self.errors["interpreter"].append(error_msg)
 
         if not self.errors["interpreter"]:
-            self.builder.BuildOps(TokenTypes) # Return true if not errors in BuildOps
-            return True
+            op_msg = self.builder.BuildOps(TokenTypes)
+            if op_msg is None:
+                return True
+            else:
+                self.errors["op"] = op_msg
+                print(type(op_msg))
+                return False
         else:
             return False
 

@@ -323,11 +323,17 @@ class CodePage(tk.Frame):
                     self.dest_entry.configure(state="readonly")
             else:
                 run_errors = Process.getErrors()
-                print(run_errors)
                 error_msg = ""
-                for err in run_errors["interpreter"]:
-                    error_msg += err + '\n'
-                messagebox.showerror("Compiler Errors", error_msg)
+                #print(run_errors)
+                if run_errors["interpreter"]:
+                    error_msg += "Interpreter Error:\n"
+                    for err in run_errors["interpreter"]:
+                        error_msg += '\t' + err + '\n'
+                if run_errors["op"]:
+                    error_msg += "OpBuilder Error:\n"
+                    error_msg +='\t' + run_errors["op"] + '\n'
+                print(error_msg)
+                messagebox.showerror("Sort Aborted", error_msg)
                 Process.clearErrors()
             
 
