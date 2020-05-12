@@ -34,10 +34,10 @@ CS441 group project
 		* createdate
 		* accessdate
 	* userdate:
-		* date: mm-dd-yyyy, compare to date, leading 0 on single digit dates
+		* date: dd-mm-yyyy, compare to date, leading 0 on single digit dates
 		* time: integer followed by s(seconds),mn(minutes),h(hours),d(days),m(months),y(years), copare to time ago
 * ex:
-	* modifydate > 01-19-2005:
+	* modifydate > 19-01-2005:
 		* if file modifydate since jan 19 2005
 	* createdate != 35d: 
 		* if file createdate not 35 days ago

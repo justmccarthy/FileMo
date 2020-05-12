@@ -51,7 +51,7 @@ and a(access) prefixes
      ***** Date Filters *****
 
 -Date format -> 
-	  dd-mm-dddd
+	  dd-mm-yyyy
    - single-digit dates require a 
      leading 0
 
@@ -67,7 +67,7 @@ and a(access) prefixes
 
 
 * modifydate-> date last modified
-	modifydate > 01-19-2005:
+	modifydate > 19-01-2005:
 
 * createdate-> date created
 	createdate != 35mn:
